@@ -1,0 +1,28 @@
+# Quartus generated output
+output_files/
+db/
+incremental_db/
+qar_info.json
+
+# Quartus project backup / auto-save
+*.qws
+*.bak
+*.orig
+
+# Programmer / simulation files (keep .sof/.pof only if you want to commit them)
+*.sof
+*.pof
+*.jdi
+*.sld
+
+# Transcript / log
+*.rpt
+*.smsg
+*.summary
+*.done
+*.flow.rpt
+*.pin
+
+# Other generated files at repo root
+DE10_LITE_Golden_Top.v
+ice_cold_beer_mono.hex
