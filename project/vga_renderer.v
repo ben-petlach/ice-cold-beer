@@ -147,8 +147,17 @@ always @(*) begin
             // (screen_x 156 → game_x 39 ; screen_x 476 → game_x 119)
             r_next = 1'b1; g_next = 1'b1; b_next = 1'b1;
 
+        end else if ((game_x >= 8'd39) && (game_x <= 8'd119) &&
+                     (game_y >= bar_y_here) && (game_y < bar_y_here + 7'd1)) begin
+            // Layer 4: bar — white (1 game-pixel thick = 4 screen rows)
+            r_next = 1'b1; g_next = 1'b1; b_next = 1'b1;
+
+        end else if ((balls_remaining > 3'b0) && in_ball) begin
+            // Layer 5: ball — white
+            r_next = 1'b1; g_next = 1'b1; b_next = 1'b1;
+
         end else if (any_hole) begin
-            // Layer 4: holes
+            // Layer 6: holes
             if (target_border) begin
                 // Target hole border — yellow
                 r_next = 1'b1; g_next = 1'b1; b_next = 1'b0;
@@ -157,15 +166,6 @@ always @(*) begin
                 r_next = 1'b1; g_next = 1'b1; b_next = 1'b1;
             end
             // else: hole interior stays black (default)
-
-        end else if ((game_x >= 8'd39) && (game_x <= 8'd119) &&
-                     (game_y >= bar_y_here) && (game_y < bar_y_here + 7'd1)) begin
-            // Layer 5: bar — white (1 game-pixel thick = 4 screen rows)
-            r_next = 1'b1; g_next = 1'b1; b_next = 1'b1;
-
-        end else if ((balls_remaining > 3'b0) && in_ball) begin
-            // Layer 6: ball — white
-            r_next = 1'b1; g_next = 1'b1; b_next = 1'b1;
 
         end else if (bg_pixel) begin
             // Layer 8: static background — white where image pixel is set
