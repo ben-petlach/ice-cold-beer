@@ -4,10 +4,10 @@ module vga_renderer (
     input  wire        blank_n,
     input  wire [10:0] h_cnt,        // 0-799 (active: 144-783 -> screen X 0-639)
     input  wire [9:0]  v_cnt,        // 0-524 (active: 35-514  -> screen Y 0-479)
-    input  wire [9:0]  ball_x,       // screen coords (0-639), center
-    input  wire [9:0]  ball_y,       // screen coords (0-479), center
-    input  wire [9:0]  bar_left_y,   // screen Y at left wall  (screen X=156)
-    input  wire [9:0]  bar_right_y,  // screen Y at right wall (screen X=476)
+    input  wire [7:0]  ball_x,       // game coords (0-159), center
+    input  wire [6:0]  ball_y,       // game coords (0-119), center
+    input  wire [6:0]  bar_left_y,   // game Y at left wall  (game X=39)
+    input  wire [6:0]  bar_right_y,  // game Y at right wall (game X=119)
     input  wire [2:0]  game_state,
     input  wire [3:0]  level,
     input  wire [2:0]  balls_remaining,
@@ -36,24 +36,32 @@ wire [7:0] game_x = screen_x[9:2];  // 0-159  (>>2 = /4)
 wire [6:0] game_y = screen_y[8:2];  // 0-119  (>>2 = /4)
 
 // ---------------------------------------------------------------------------
-// Bar interpolation (screen space)
-// Bar spans screen_x 156-476 (width=320). Divide by 320 using * 205 >> 16 multiplier.
+// Bar interpolation (game space)
+// Bar spans game_x 39-119 (width=80). Divide by 80 using * 205 >> 14 multiplier.
 // ---------------------------------------------------------------------------
-wire signed [15:0] bar_slope  = $signed({1'b0, bar_right_y}) - $signed({1'b0, bar_left_y});
-wire signed [15:0] bar_offset = $signed({1'b0, screen_x}) - 16'sd156;
+wire signed [7:0]  bar_slope  = $signed({1'b0, bar_right_y}) - $signed({1'b0, bar_left_y});
+wire        [6:0]  bar_offset = game_x[6:0] - 7'd39;          // 0-80 when in bar X range
 
-wire signed [31:0] y_offset   = (bar_slope * bar_offset * 32'sd205) >>> 16;
-wire signed [15:0] surface_y  = $signed({1'b0, bar_left_y}) + y_offset[15:0];
-wire        [9:0]  bar_y_here = surface_y[9:0];
+wire signed [31:0] raw_offset = bar_slope * $signed({1'b0, bar_offset}) * 32'sd205;
+wire signed [15:0] y_offset   = (raw_offset + 32'sd8192) >>> 14;
+wire signed [15:0] surface_y  = $signed({1'b0, bar_left_y}) + y_offset;
+wire        [6:0]  bar_y_here = surface_y[6:0];
 
 // ---------------------------------------------------------------------------
-// Ball circle test (screen space)
-// r=4 -> r^2 = 16
+// Ball circle test (game space)
+// r²=2 → 3×3 diamond (orthogonal neighbours + center); each game px = 4×4 screen px
 // ---------------------------------------------------------------------------
-wire signed [10:0] bdx       = $signed({1'b0, screen_x}) - $signed({1'b0, ball_x});
-wire signed [10:0] bdy       = $signed({1'b0, screen_y}) - $signed({1'b0, ball_y});
-wire        [21:0] ball_dist2 = bdx * bdx + bdy * bdy;
-wire               in_ball   = (ball_dist2 <= 22'd16);
+wire [7:0] draw_ball_x = 8'd79; // Hardcoded horizontal position at center of bar
+wire signed [8:0] ball_bar_offset = $signed({1'b0, draw_ball_x}) - 9'sd39;
+wire signed [31:0] ball_raw_offset = bar_slope * ball_bar_offset * 32'sd205;
+wire signed [15:0] ball_y_offset   = (ball_raw_offset + 32'sd8192) >>> 14;
+wire signed [15:0] ball_surface_y  = $signed({1'b0, bar_left_y}) + ball_y_offset;
+wire [6:0] draw_ball_y = ball_surface_y[6:0] - 7'd2; // rests on top of the bar
+
+wire signed [8:0] bdx       = $signed({1'b0, game_x}) - $signed({1'b0, draw_ball_x});
+wire signed [7:0] bdy       = $signed({1'b0, game_y}) - $signed({1'b0, draw_ball_y});
+wire        [17:0] ball_dist2 = bdx * bdx + bdy * bdy;
+wire               in_ball   = (ball_dist2 <= 18'd2);
 
 // ---------------------------------------------------------------------------
 // Hole rendering (game space) — generate per-hole wires, OR-reduced outside
@@ -150,9 +158,9 @@ always @(*) begin
             end
             // else: hole interior stays black (default)
 
-        end else if ((screen_x >= 10'd156) && (screen_x <= 10'd476) &&
-                     (screen_y >= bar_y_here) && (screen_y < bar_y_here + 10'd2)) begin
-            // Layer 5: bar — white (2 screen pixels thick)
+        end else if ((game_x >= 8'd39) && (game_x <= 8'd119) &&
+                     (game_y >= bar_y_here) && (game_y < bar_y_here + 7'd1)) begin
+            // Layer 5: bar — white (1 game-pixel thick = 4 screen rows)
             r_next = 1'b1; g_next = 1'b1; b_next = 1'b1;
 
         end else if ((balls_remaining > 3'b0) && in_ball) begin
