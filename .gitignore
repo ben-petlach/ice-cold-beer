@@ -23,6 +23,3 @@ qar_info.json
 *.flow.rpt
 *.pin
 
-# Other generated files at repo root
-DE10_LITE_Golden_Top.v
-ice_cold_beer_mono.hex
