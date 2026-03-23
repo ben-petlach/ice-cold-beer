@@ -19,13 +19,15 @@ set_global_assignment -name BOARD "MAX 10 DE10 - Lite"
 set_global_assignment -name VERILOG_FILE project/ice_cold_beer_top.v
 set_global_assignment -name VERILOG_FILE project/bar_controller.v
 set_global_assignment -name SYSTEMVERILOG_FILE project/vga_renderer.v
+set_global_assignment -name SYSTEMVERILOG_FILE project/game_state_machine.v
 set_global_assignment -name VERILOG_FILE project/vga_pll.v
 set_global_assignment -name VERILOG_FILE project/video_sync_generator.v
 set_global_assignment -name VERILOG_FILE project/number_driver.v
 
 # .vh files are include files, not source files — use VERILOG_INCLUDE_FILE
-# so Quartus resolves `include "hole_positions.vh" inside vga_renderer.v
+# so Quartus resolves `include "hole_positions.vh" and `include "level_holes.vh"
 set_global_assignment -name VERILOG_INCLUDE_FILE project/hole_positions.vh
+set_global_assignment -name VERILOG_INCLUDE_FILE project/level_holes.vh
 
 # -------------------------------------------------------------------------- #
 # Clock
