@@ -149,35 +149,26 @@ module top (
         .balls_remaining(balls_remaining)
     );
 
-    wire vga_r_out, vga_g_out, vga_b_out;
-
     vga_renderer u_vga_renderer (
-        .clk            (clk_25),
+        .clk_25         (clk_25),
         .rst            (sync_reset),
         .blank_n        (blank_n),
         .h_cnt          (h_cnt),
         .v_cnt          (v_cnt),
-        .ball_x         (ball_x[9:2]),
-        .ball_y         (ball_y[9:2]),
-        .bar_left_y     (bar_left_y[9:2]),
-        .bar_right_y    (bar_right_y[9:2]),
+        .ball_x         (ball_x),
+        .ball_y         (ball_y),
+        .bar_left_y     (bar_left_y),
+        .bar_right_y    (bar_right_y),
         .game_state     (game_state),
         .level          (level),
         .balls_remaining(balls_remaining),
         .score          (score),
         .target_hole_id (target_hole_id),
-        .vga_r          (vga_r_out),
-        .vga_g          (vga_g_out),
-        .vga_b          (vga_b_out)
+        .VGA_R          (VGA_R),
+        .VGA_G          (VGA_G),
+        .VGA_B          (VGA_B),
+        .start_btn      (start_btn),
+        .play_again_btn (play_again_btn)
     );
-
-    // Replicate 1-bit color to 4-bit VGA signals for max brightness
-    assign VGA_R = {4{vga_r_out}};
-    assign VGA_G = {4{vga_g_out}};
-    assign VGA_B = {4{vga_b_out}};
-
-    // Stub these buttons for now until UI screens are added
-    assign start_btn = 1'b0;
-    assign play_again_btn = 1'b0;
 
 endmodule

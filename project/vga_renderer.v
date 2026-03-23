@@ -51,8 +51,15 @@ wire        [6:0]  bar_y_here = surface_y[6:0];
 // Ball circle test (game space)
 // r²=2 → 3×3 diamond (orthogonal neighbours + center); each game px = 4×4 screen px
 // ---------------------------------------------------------------------------
-wire signed [8:0] bdx       = $signed({1'b0, game_x}) - $signed({1'b0, ball_x});
-wire signed [7:0] bdy       = $signed({1'b0, game_y}) - $signed({1'b0, ball_y});
+wire [7:0] draw_ball_x = 8'd79; // Hardcoded horizontal position at center of bar
+wire signed [8:0] ball_bar_offset = $signed({1'b0, draw_ball_x}) - 9'sd39;
+wire signed [31:0] ball_raw_offset = bar_slope * ball_bar_offset * 32'sd205;
+wire signed [15:0] ball_y_offset   = (ball_raw_offset + 32'sd8192) >>> 14;
+wire signed [15:0] ball_surface_y  = $signed({1'b0, bar_left_y}) + ball_y_offset;
+wire [6:0] draw_ball_y = ball_surface_y[6:0] - 7'd2; // rests on top of the bar
+
+wire signed [8:0] bdx       = $signed({1'b0, game_x}) - $signed({1'b0, draw_ball_x});
+wire signed [7:0] bdy       = $signed({1'b0, game_y}) - $signed({1'b0, draw_ball_y});
 wire        [17:0] ball_dist2 = bdx * bdx + bdy * bdy;
 wire               in_ball   = (ball_dist2 <= 18'd2);
 
