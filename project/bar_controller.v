@@ -1,3 +1,6 @@
+//BUG: pivots about a point, but the side opposite moves as well
+// ex. if moving the left side up, it will go up, but the right side will also go down a bit. Instead, the bar should "extend" to its max height difference rather than "maintain length", while keeping the side not moving anchored to where it is
+
 module bar_controller #(
     parameter Y_MIN = 60,            // Highest point the bar can reach (minimum Y)
     parameter Y_MAX = 460,           // Lowest point the bar can reach (maximum Y)
@@ -21,38 +24,33 @@ module bar_controller #(
     wire move_r_up   = (joy_right == 2'b10);
     wire move_r_down = (joy_right == 2'b01);
 
-    wire [9:0] next_left_y;
-    wire [9:0] next_right_y;
+    wire [9:0] proposed_left_y = move_l_up ? (bar_left_y > (Y_MIN + BAR_SPEED) ? bar_left_y - BAR_SPEED : Y_MIN) :
+                                 move_l_down ? (bar_left_y < (Y_MAX - BAR_SPEED) ? bar_left_y + BAR_SPEED : Y_MAX) :
+                                 bar_left_y;
 
-    assign next_left_y = move_l_up ? (bar_left_y > (Y_MIN + BAR_SPEED) ? bar_left_y - BAR_SPEED : Y_MIN) :
-                         move_l_down ? (bar_left_y < (Y_MAX - BAR_SPEED) ? bar_left_y + BAR_SPEED : Y_MAX) :
-                         bar_left_y;
+    wire [9:0] proposed_right_y = move_r_up ? (bar_right_y > (Y_MIN + BAR_SPEED) ? bar_right_y - BAR_SPEED : Y_MIN) :
+                                  move_r_down ? (bar_right_y < (Y_MAX - BAR_SPEED) ? bar_right_y + BAR_SPEED : Y_MAX) :
+                                  bar_right_y;
 
-    assign next_right_y = move_r_up ? (bar_right_y > (Y_MIN + BAR_SPEED) ? bar_right_y - BAR_SPEED : Y_MIN) :
-                          move_r_down ? (bar_right_y < (Y_MAX - BAR_SPEED) ? bar_right_y + BAR_SPEED : Y_MAX) :
-                          bar_right_y;
+    wire [9:0] min_left_y = (bar_right_y > MAX_DY) ? (bar_right_y - MAX_DY) : 0;
+    wire [9:0] max_left_y = bar_right_y + MAX_DY;
 
-    wire [10:0] diff_both = (next_left_y > next_right_y) ? (next_left_y - next_right_y) : (next_right_y - next_left_y);
-    wire [10:0] diff_left_only = (next_left_y > bar_right_y) ? (next_left_y - bar_right_y) : (bar_right_y - next_left_y);
-    wire [10:0] diff_right_only = (bar_left_y > next_right_y) ? (bar_left_y - next_right_y) : (next_right_y - bar_left_y);
+    wire [9:0] min_right_y = (bar_left_y > MAX_DY) ? (bar_left_y - MAX_DY) : 0;
+    wire [9:0] max_right_y = bar_left_y + MAX_DY;
 
-    wire both_valid = (diff_both <= MAX_DY);
-    wire left_valid = (diff_left_only <= MAX_DY);
-    wire right_valid = (diff_right_only <= MAX_DY);
+    wire [9:0] clamped_left_y  = (proposed_left_y < min_left_y) ? min_left_y :
+                                 (proposed_left_y > max_left_y) ? max_left_y : proposed_left_y;
+
+    wire [9:0] clamped_right_y = (proposed_right_y < min_right_y) ? min_right_y :
+                                 (proposed_right_y > max_right_y) ? max_right_y : proposed_right_y;
 
     always @(posedge clk) begin
         if (rst) begin
             bar_left_y <= START_Y;
             bar_right_y <= START_Y;
         end else if (tick_60hz && en) begin
-            if (both_valid) begin
-                bar_left_y <= next_left_y;
-                bar_right_y <= next_right_y;
-            end else begin
-                // If moving both is invalid, see if we can move just one
-                if (left_valid) bar_left_y <= next_left_y;
-                if (right_valid) bar_right_y <= next_right_y;
-            end
+            bar_left_y <= clamped_left_y;
+            bar_right_y <= clamped_right_y;
         end
     end
 
