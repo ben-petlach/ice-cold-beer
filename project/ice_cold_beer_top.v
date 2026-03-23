@@ -93,15 +93,26 @@ video_sync_generator sync_gen (
 //     Replace each stub with the real module output once written.
 // ---------------------------------------------------------------------------
 
-// --- Ball physics stub ----------------------------------------------------
-// TODO: replace with ball_physics instance
-wire [7:0] ball_x    = 8'd79;   // game-pixel centre X (0-159)
-wire [6:0] ball_y    = 7'd60;   // game-pixel centre Y (0-119)
-wire       ball_lost = 1'b0;    // TODO: ball_physics.ball_lost
+// --- Ball physics ----------------------------------------------------------
+wire [7:0] ball_x;
+wire [6:0] ball_y   = 7'd60;   // Y computed in renderer from bar; stub here
+wire       ball_lost;
+
+ball_physics ball_phys (
+    .clk         (vga_clk),
+    .rst         (rst),
+    .tick_60hz   (tick_60hz),
+    .game_state  (game_state),
+    .bar_left_y  (bar_left_y),
+    .bar_right_y (bar_right_y),
+    .ball_x      (ball_x),
+    .ball_lost   (ball_lost)
+);
 
 // --- Game state machine ---------------------------------------------------
 wire [2:0]  game_state;
 wire [3:0]  level;
+wire [3:0]  current_step;
 wire [2:0]  balls_remaining;
 wire [15:0] score;
 wire [5:0]  target_hole_id;
@@ -115,6 +126,7 @@ game_state_machine gsm (
     .ball_lost      (ball_lost),
     .game_state     (game_state),
     .level          (level),
+    .current_step   (current_step),
     .balls_remaining(balls_remaining),
     .score          (score),
     .target_hole_id (target_hole_id)
@@ -160,6 +172,7 @@ vga_renderer renderer (
     .bar_right_y    (bar_right_y),
     .game_state     (game_state),
     .level          (level),
+    .current_step   (current_step),
     .balls_remaining(balls_remaining),
     .score          (score),
     .target_hole_id (target_hole_id),

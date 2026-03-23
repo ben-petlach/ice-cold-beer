@@ -10,6 +10,7 @@ module vga_renderer (
     input  wire [6:0]  bar_right_y,  // game Y at right wall (game X=119)
     input  wire [2:0]  game_state,
     input  wire [3:0]  level,
+    input  wire [3:0]  current_step,
     input  wire [2:0]  balls_remaining,
     input  wire [15:0] score,
     input  wire [5:0]  target_hole_id,
@@ -51,7 +52,7 @@ wire        [6:0]  bar_y_here = surface_y[6:0];
 // Ball circle test (game space)
 // r²=2 → 3×3 diamond (orthogonal neighbours + center); each game px = 4×4 screen px
 // ---------------------------------------------------------------------------
-wire [7:0] draw_ball_x = 8'd79; // Hardcoded horizontal position at center of bar
+wire [7:0] draw_ball_x = ball_x; // driven by ball_physics
 wire signed [8:0] ball_bar_offset = $signed({1'b0, draw_ball_x}) - 9'sd39;
 wire signed [31:0] ball_raw_offset = bar_slope * ball_bar_offset * 32'sd205;
 wire signed [15:0] ball_y_offset   = (ball_raw_offset + 32'sd8192) >>> 14;
@@ -117,6 +118,111 @@ wire [159:0] bg_row_cur = bg_rows[game_y];
 wire         bg_pixel   = bg_row_cur[game_x];
 
 // ---------------------------------------------------------------------------
+// HUD — right panel overlays (game_x 120-159)
+// All digits use number_driver's 3×5 font.
+// ---------------------------------------------------------------------------
+
+// --- ROUND digit (level+1) at game (149, 1) ---
+wire [3:0]  hud_round_val = {2'b0, level[1:0]} + 4'd1;
+wire [14:0] hud_round_bmp;
+number_driver nd_round (.digit(hud_round_val), .bitmap(hud_round_bmp));
+wire        hud_in_round    = (game_x >= 8'd149) && (game_x <= 8'd151) &&
+                              (game_y >= 7'd1)   && (game_y <= 7'd5);
+wire [6:0]  hud_round_cy    = game_y - 7'd1;
+wire [7:0]  hud_round_cx    = game_x - 8'd149;
+wire [3:0]  hud_round_row   = 4'd4 - {1'b0, hud_round_cy[2:0]};
+wire [3:0]  hud_round_col   = 4'd2 - {2'b0, hud_round_cx[1:0]};
+wire [3:0]  hud_round_idx   = hud_round_row * 3 + hud_round_col;
+wire        hud_round_px    = hud_in_round && hud_round_bmp[hud_round_idx];
+
+// --- LVL digit(s) at game (140, 8) — shows current_step+1 (1-10) ---
+// "/10" suffix is already in the background ROM image
+wire [3:0]  hud_lvl_val     = current_step + 4'd1;       // 1-10
+wire        hud_lvl_ten     = (hud_lvl_val == 4'd10);     // true on step 9
+
+// Ones digit: x=140 for 1-9, shifts to x=144 when showing "10"
+wire [14:0] hud_lvl_ones_bmp;
+number_driver nd_lvl_ones (.digit(hud_lvl_ten ? 4'd0 : hud_lvl_val), .bitmap(hud_lvl_ones_bmp));
+wire [7:0]  hud_lvl_ones_x  = hud_lvl_ten ? 8'd144 : 8'd140;
+wire        hud_in_lvl_ones = (game_x >= hud_lvl_ones_x) && (game_x <= hud_lvl_ones_x + 8'd2) &&
+                              (game_y >= 7'd8) && (game_y <= 7'd12);
+wire [6:0]  hud_lvl_ones_cy  = game_y - 7'd8;
+wire [7:0]  hud_lvl_ones_cx  = game_x - hud_lvl_ones_x;
+wire [3:0]  hud_lvl_ones_row = 4'd4 - {1'b0, hud_lvl_ones_cy[2:0]};
+wire [3:0]  hud_lvl_ones_col = 4'd2 - {2'b0, hud_lvl_ones_cx[1:0]};
+wire [3:0]  hud_lvl_ones_idx = hud_lvl_ones_row * 3 + hud_lvl_ones_col;
+wire        hud_lvl_ones_px  = hud_in_lvl_ones && hud_lvl_ones_bmp[hud_lvl_ones_idx];
+
+// Tens digit "1" at x=140, only shown when step=9 (displaying "10")
+wire [14:0] hud_lvl_tens_bmp;
+number_driver nd_lvl_tens (.digit(hud_lvl_ten ? 4'd1 : 4'd0), .bitmap(hud_lvl_tens_bmp));
+wire        hud_in_lvl_tens = hud_lvl_ten &&
+                              (game_x >= 8'd140) && (game_x <= 8'd142) &&
+                              (game_y >= 7'd8)   && (game_y <= 7'd12);
+wire [6:0]  hud_lvl_tens_cy  = game_y - 7'd8;
+wire [7:0]  hud_lvl_tens_cx  = game_x - 8'd140;
+wire [3:0]  hud_lvl_tens_row = 4'd4 - {1'b0, hud_lvl_tens_cy[2:0]};
+wire [3:0]  hud_lvl_tens_col = 4'd2 - {2'b0, hud_lvl_tens_cx[1:0]};
+wire [3:0]  hud_lvl_tens_idx = hud_lvl_tens_row * 3 + hud_lvl_tens_col;
+wire        hud_lvl_tens_px  = hud_in_lvl_tens && hud_lvl_tens_bmp[hud_lvl_tens_idx];
+
+// --- Ball graphics: 5 × 7×7 game-pixel balls ---
+// Positions (top-left): (122,23),(130,23),(138,23),(146,23),(122,31)
+// Ball i is filled (spare) when balls_remaining >= i+2; last ball = all hollow.
+wire hud_in_b0 = (game_x>=8'd122)&&(game_x<=8'd128)&&(game_y>=7'd23)&&(game_y<=7'd29);
+wire hud_in_b1 = (game_x>=8'd130)&&(game_x<=8'd136)&&(game_y>=7'd23)&&(game_y<=7'd29);
+wire hud_in_b2 = (game_x>=8'd138)&&(game_x<=8'd144)&&(game_y>=7'd23)&&(game_y<=7'd29);
+wire hud_in_b3 = (game_x>=8'd146)&&(game_x<=8'd152)&&(game_y>=7'd23)&&(game_y<=7'd29);
+wire hud_in_b4 = (game_x>=8'd122)&&(game_x<=8'd128)&&(game_y>=7'd31)&&(game_y<=7'd37);
+wire hud_in_any_ball = hud_in_b0|hud_in_b1|hud_in_b2|hud_in_b3|hud_in_b4;
+
+wire [7:0] hud_bdx = hud_in_b0 ? (game_x - 8'd122) :
+                     hud_in_b1 ? (game_x - 8'd130) :
+                     hud_in_b2 ? (game_x - 8'd138) :
+                     hud_in_b3 ? (game_x - 8'd146) :
+                                 (game_x - 8'd122);
+wire [6:0] hud_bdy = (hud_in_b4) ? (game_y - 7'd31) : (game_y - 7'd23);
+
+// Filled ball pattern (7 rows × 7 bits; bit 6 = leftmost pixel x=0)
+reg [6:0] hud_ball_filled_row;
+always @(*) case (hud_bdy)
+    7'd0: hud_ball_filled_row = 7'b0011100;
+    7'd1: hud_ball_filled_row = 7'b0111010;
+    7'd2: hud_ball_filled_row = 7'b1111101;
+    7'd3: hud_ball_filled_row = 7'b1111111;
+    7'd4: hud_ball_filled_row = 7'b1111111;
+    7'd5: hud_ball_filled_row = 7'b0111110;
+    7'd6: hud_ball_filled_row = 7'b0011100;
+    default: hud_ball_filled_row = 7'b0000000;
+endcase
+
+// Hollow ball pattern (outer ring only)
+reg [6:0] hud_ball_hollow_row;
+always @(*) case (hud_bdy)
+    7'd0: hud_ball_hollow_row = 7'b0011100;
+    7'd1: hud_ball_hollow_row = 7'b0100010;
+    7'd2: hud_ball_hollow_row = 7'b1000001;
+    7'd3: hud_ball_hollow_row = 7'b1000001;
+    7'd4: hud_ball_hollow_row = 7'b1000001;
+    7'd5: hud_ball_hollow_row = 7'b0100010;
+    7'd6: hud_ball_hollow_row = 7'b0011100;
+    default: hud_ball_hollow_row = 7'b0000000;
+endcase
+
+wire hud_b0_fill = (balls_remaining >= 3'd2);
+wire hud_b1_fill = (balls_remaining >= 3'd3);
+wire hud_b2_fill = (balls_remaining >= 3'd4);
+wire hud_b3_fill = (balls_remaining >= 3'd5);
+wire hud_b4_fill = (balls_remaining >= 3'd6);
+
+wire hud_cur_ball_fill = (hud_in_b0 & hud_b0_fill) | (hud_in_b1 & hud_b1_fill) |
+                         (hud_in_b2 & hud_b2_fill) | (hud_in_b3 & hud_b3_fill) |
+                         (hud_in_b4 & hud_b4_fill);
+
+wire [6:0] hud_ball_row = hud_cur_ball_fill ? hud_ball_filled_row : hud_ball_hollow_row;
+wire       hud_ball_px  = hud_ball_row[3'd6 - hud_bdx[2:0]];
+
+// ---------------------------------------------------------------------------
 // Combinational pixel logic — priority: first match wins
 // ---------------------------------------------------------------------------
 reg r_next, g_next, b_next;
@@ -166,6 +272,22 @@ always @(*) begin
                 r_next = 1'b1; g_next = 1'b1; b_next = 1'b1;
             end
             // else: hole interior stays black (default)
+
+        end else if (hud_in_round) begin
+            // Layer 7: ROUND digit
+            r_next = hud_round_px; g_next = hud_round_px; b_next = hud_round_px;
+
+        end else if (hud_in_lvl_tens) begin
+            // Layer 7: LVL tens digit (only when step=9, showing "10")
+            r_next = hud_lvl_tens_px; g_next = hud_lvl_tens_px; b_next = hud_lvl_tens_px;
+
+        end else if (hud_in_lvl_ones) begin
+            // Layer 7: LVL ones digit
+            r_next = hud_lvl_ones_px; g_next = hud_lvl_ones_px; b_next = hud_lvl_ones_px;
+
+        end else if (hud_in_any_ball) begin
+            // Layer 7: ball graphics — filled or hollow ring
+            r_next = hud_ball_px; g_next = hud_ball_px; b_next = hud_ball_px;
 
         end else if (bg_pixel) begin
             // Layer 8: static background — white where image pixel is set
