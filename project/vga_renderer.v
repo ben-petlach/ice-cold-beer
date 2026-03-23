@@ -28,7 +28,7 @@ localparam S_GAME_OVER  = 3'b010;
 // Screen coordinate conversion (VGA hardware signals — unchanged)
 // H: h_cnt active region starts at H_SYNC_PULSE + H_BACK_PORCH = 96+48 = 144
 // V: v_cnt active region starts at V_SYNC_PULSE + V_BACK_PORCH =  2+33 = 35
-wire [9:0] screen_x = h_cnt[9:0] - 10'd144;
+wire [9:0] screen_x = h_cnt[9:0] - 10'd160;
 wire [9:0] screen_y = v_cnt      - 10'd35;
 
 // Game coordinate conversion (convert once here; all logic below uses game coords)
@@ -81,10 +81,10 @@ generate
         wire in_bounds     = (game_x >= hsx)           && (game_x < hsx + 8'd8) &&
                              (game_y >= hsy)           && (game_y < hsy + 7'd8);
         // Diagonal corner cut: 3 game pixels per corner (as specified in hole_positions.vh)
-        wire corner        = (dx + dy             < 3'd2) ||
-                             (dx + (3'd7 - dy)    < 3'd2) ||
-                             ((3'd7 - dx) + dy    < 3'd2) ||
-                             ((3'd7 - dx) + (3'd7 - dy) < 3'd2);
+        wire corner        = (({1'b0, dx} + {1'b0, dy})              < 4'd2) ||
+                             (({1'b0, dx} + {1'b0, 3'd7 - dy})        < 4'd2) ||
+                             (({1'b0, 3'd7 - dx} + {1'b0, dy})        < 4'd2) ||
+                             (({1'b0, 3'd7 - dx} + {1'b0, 3'd7 - dy}) < 4'd2);
         assign hole_active[i]    = in_bounds && !corner;
         assign hole_border[i]    = hole_active[i] &&
                                    (dx == 3'd0 || dx == 3'd7 ||
@@ -166,10 +166,6 @@ always @(*) begin
         end else if ((balls_remaining > 3'b0) && in_ball) begin
             // Layer 6: ball — white
             r_next = 1'b1; g_next = 1'b1; b_next = 1'b1;
-
-        end else if (game_y < 7'd5) begin
-            // Layer 7: HUD strip stub — green (game_y<5 → screen rows 0-19)
-            r_next = 1'b0; g_next = 1'b1; b_next = 1'b0;
 
         end else if (bg_pixel) begin
             // Layer 8: static background — white where image pixel is set

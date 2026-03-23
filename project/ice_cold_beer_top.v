@@ -93,22 +93,32 @@ video_sync_generator sync_gen (
 //     Replace each stub with the real module output once written.
 // ---------------------------------------------------------------------------
 
-// --- State machine stub ---------------------------------------------------
-// TODO: replace with game_state_machine instance
-localparam S_START_MENU = 3'b000;
-localparam S_PLAYING    = 3'b001;
-localparam S_GAME_OVER  = 3'b010;
-
-wire [2:0] game_state     = S_PLAYING;   // TODO: game_state_machine.game_state
-wire [2:0] balls_remaining = 3'd3;       // TODO: game_state_machine.balls_remaining
-wire [15:0] score          = 16'd0;      // TODO: game_state_machine.score
-wire [3:0]  level          = 4'd0;       // TODO: game_state_machine.level
-wire [5:0]  target_hole_id = 6'd0;       // TODO: game_state_machine.target_hole_id
-
 // --- Ball physics stub ----------------------------------------------------
 // TODO: replace with ball_physics instance
-wire [7:0] ball_x = 8'd79;   // game-pixel centre X (0-159)
-wire [6:0] ball_y = 7'd60;   // game-pixel centre Y (0-119)
+wire [7:0] ball_x    = 8'd79;   // game-pixel centre X (0-159)
+wire [6:0] ball_y    = 7'd60;   // game-pixel centre Y (0-119)
+wire       ball_lost = 1'b0;    // TODO: ball_physics.ball_lost
+
+// --- Game state machine ---------------------------------------------------
+wire [2:0]  game_state;
+wire [3:0]  level;
+wire [2:0]  balls_remaining;
+wire [15:0] score;
+wire [5:0]  target_hole_id;
+
+game_state_machine gsm (
+    .clk            (vga_clk),
+    .rst            (rst),
+    .key_start      (~KEY[1]),      // KEY[1] active-low → invert to active-high
+    .ball_x         (ball_x),
+    .ball_y         (ball_y),
+    .ball_lost      (ball_lost),
+    .game_state     (game_state),
+    .level          (level),
+    .balls_remaining(balls_remaining),
+    .score          (score),
+    .target_hole_id (target_hole_id)
+);
 
 // --- Bar controller --------------------------------------------------------
 wire [9:0] bar_left_y_10, bar_right_y_10;
