@@ -37,14 +37,15 @@ wire [6:0] game_y = screen_y[8:2];  // 0-119  (>>2 = /4)
 
 // ---------------------------------------------------------------------------
 // Bar interpolation (game space)
-// Bar spans game_x 39-119 (width=80). Divide by 80 approximated as >>6 (/64).
-// ~25% error at far end — identical quality to previous >>8 ≈ /256 ≈ /320.
+// Bar spans game_x 39-119 (width=80). Divide by 80 using * 205 >> 14 multiplier.
 // ---------------------------------------------------------------------------
 wire signed [7:0]  bar_slope  = $signed({1'b0, bar_right_y}) - $signed({1'b0, bar_left_y});
 wire        [6:0]  bar_offset = game_x[6:0] - 7'd39;          // 0-80 when in bar X range
-wire signed [14:0] bar_interp = $signed({1'b0, bar_left_y, 6'b0}) +
-                                 bar_slope * $signed({1'b0, bar_offset});
-wire        [6:0]  bar_y_here = bar_interp[12:6];              // >>6 ≈ /64 ≈ /80
+
+wire signed [31:0] raw_offset = bar_slope * $signed({1'b0, bar_offset}) * 32'sd205;
+wire signed [15:0] y_offset   = (raw_offset + 32'sd8192) >>> 14;
+wire signed [15:0] surface_y  = $signed({1'b0, bar_left_y}) + y_offset;
+wire        [6:0]  bar_y_here = surface_y[6:0];
 
 // ---------------------------------------------------------------------------
 // Ball circle test (game space)
