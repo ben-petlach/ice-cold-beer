@@ -47,10 +47,16 @@ wire signed [7:0] bar_slope = $signed({1'b0, bar_right_y}) - $signed({1'b0, bar_
 // ---------------------------------------------------------------------------
 
 // 1. Acceleration from tilt
-wire signed [15:0] vel_acc  = vel_x + {{8{bar_slope[7]}}, bar_slope};
+// Apply a deadzone so the ball stops when the bar is nearly level (pixel distance <= 5)
+wire [7:0] abs_bar_slope = bar_slope[7] ? -bar_slope : bar_slope;
+wire signed [7:0] effective_bar_slope = (abs_bar_slope <= 5) ? 8'sd0 : bar_slope;
+
+wire signed [15:0] vel_acc  = vel_x + {{8{effective_bar_slope[7]}}, effective_bar_slope};
 
 // 2. Friction: reduce by 1/8 per tick (arithmetic right shift preserves sign)
-wire signed [15:0] vel_fric = vel_acc - (vel_acc >>> 3);
+wire signed [15:0] vel_damped = vel_acc - (vel_acc >>> 3);
+// Hard stop for very low speeds to prevent creeping when bar is level
+wire signed [15:0] vel_fric = (effective_bar_slope == 8'sd0 && vel_damped > -8 && vel_damped < 8) ? 16'sd0 : vel_damped;
 
 // 3. Clamp velocity to +-1 game pixel/tick
 wire signed [15:0] vel_new  = (vel_fric >  16'sd256) ?  16'sd256 :
