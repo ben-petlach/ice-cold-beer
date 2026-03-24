@@ -27,6 +27,7 @@ module game_state_machine (
     input  wire        ball_lost,       // active-high pulse: ball fell past bar
     output reg  [2:0]  game_state,
     output reg  [3:0]  level,
+    output reg  [3:0]  current_step,
     output reg  [2:0]  balls_remaining,
     output reg  [15:0] score,
     output wire [5:0]  target_hole_id
@@ -38,9 +39,6 @@ module game_state_machine (
 localparam S_START_MENU = 3'b000;
 localparam S_PLAYING    = 3'b001;
 localparam S_GAME_OVER  = 3'b010;
-
-// Current position within a level (0 = first/bottom target, 9 = last/top target)
-reg [3:0] current_step;
 
 // ---------------------------------------------------------------------------
 // Target hole lookup (combinational ROM)
@@ -73,7 +71,7 @@ always @(posedge clk) begin
         game_state      <= S_START_MENU;
         level           <= 4'd0;
         current_step    <= 4'd0;
-        balls_remaining <= 3'd3;
+        balls_remaining <= 3'd6;
         score           <= 16'd0;
         in_hole_prev    <= 1'b0;
         key_prev        <= 1'b0;
@@ -88,7 +86,7 @@ always @(posedge clk) begin
                     game_state      <= S_PLAYING;
                     level           <= 4'd0;
                     current_step    <= 4'd0;
-                    balls_remaining <= 3'd3;
+                    balls_remaining <= 3'd6;
                     score           <= 16'd0;
                 end
             end
