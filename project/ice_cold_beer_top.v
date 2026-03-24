@@ -64,7 +64,7 @@ vga_pll pll (
 );
 
 // Active-high synchronous reset: hold until PLL is locked or KEY[0] pressed
-wire rst = ~pll_locked | ~KEY[0];
+wire rst = ~pll_locked | SW[9];    // SW[9] active-high reset; KEY[0] now a debug input
 
 // ---------------------------------------------------------------------------
 // 2.  VGA sync generator  —  produces h_cnt, v_cnt, blank_n, HS, VS
@@ -101,6 +101,7 @@ wire       ball_lost;
 ball_physics ball_phys (
     .clk         (vga_clk),
     .rst         (rst),
+    .ball_event  (ball_event),
     .tick_60hz   (tick_60hz),
     .game_state  (game_state),
     .bar_left_y  (bar_left_y),
@@ -116,11 +117,13 @@ wire [3:0]  current_step;
 wire [2:0]  balls_remaining;
 wire [15:0] score;
 wire [5:0]  target_hole_id;
+wire        ball_event;
 
 game_state_machine gsm (
     .clk            (vga_clk),
     .rst            (rst),
-    .key_start      (~KEY[1]),      // KEY[1] active-low → invert to active-high
+    .key_hole       (~KEY[0]),      // KEY[0] active-low → active-high: skip to next hole
+    .key_ball_lost  (~KEY[1]),      // KEY[1] active-low → active-high: lose a ball
     .ball_x         (ball_x),
     .ball_y         (ball_y),
     .ball_lost      (ball_lost),
@@ -129,7 +132,8 @@ game_state_machine gsm (
     .current_step   (current_step),
     .balls_remaining(balls_remaining),
     .score          (score),
-    .target_hole_id (target_hole_id)
+    .target_hole_id (target_hole_id),
+    .ball_event     (ball_event)
 );
 
 // --- Bar controller --------------------------------------------------------
@@ -144,6 +148,7 @@ bar_controller #(
 ) bar_ctrl (
     .clk        (vga_clk),
     .rst        (rst),
+    .ball_event (ball_event),
     .en         (1'b1),
     .tick_60hz  (tick_60hz),
     .joy_left   ({SW[0], SW[1]}),   // SW0=up, SW1=down
@@ -158,7 +163,7 @@ wire [6:0] bar_right_y = bar_right_y_10[6:0];
 // ---------------------------------------------------------------------------
 // 4.  Pixel renderer
 // ---------------------------------------------------------------------------
-wire vga_r, vga_g, vga_b;
+wire vga_r, vga_g, vga_b, ball_gray;
 
 vga_renderer renderer (
     .clk            (vga_clk),
@@ -178,16 +183,18 @@ vga_renderer renderer (
     .target_hole_id (target_hole_id),
     .vga_r          (vga_r),
     .vga_g          (vga_g),
-    .vga_b          (vga_b)
+    .vga_b          (vga_b),
+    .ball_gray      (ball_gray)
 );
 
 // ---------------------------------------------------------------------------
 // 5.  VGA DAC  —  1-bit colour → 4-bit resistor ladder (DE10-Lite)
 //     Replicate the single bit across all 4 DAC bits: 0→0000, 1→1111
 // ---------------------------------------------------------------------------
-assign VGA_R = {4{vga_r}};
-assign VGA_G = {4{vga_g}};
-assign VGA_B = {4{vga_b}};
+// ball_gray = 1 drives ~38% brightness (matches ball.png gray body, rgb 98,98,98)
+assign VGA_R = ball_gray ? 4'h6 : {4{vga_r}};
+assign VGA_G = ball_gray ? 4'h6 : {4{vga_g}};
+assign VGA_B = ball_gray ? 4'h6 : {4{vga_b}};
 
 // ---------------------------------------------------------------------------
 // 6.  Status outputs
