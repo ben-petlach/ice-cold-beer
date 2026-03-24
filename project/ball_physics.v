@@ -49,7 +49,7 @@ wire signed [7:0] bar_slope = $signed({1'b0, bar_right_y}) - $signed({1'b0, bar_
 // 1. Acceleration from tilt
 // Apply a deadzone so the ball stops when the bar is nearly level (pixel distance <= 5)
 wire [7:0] abs_bar_slope = bar_slope[7] ? -bar_slope : bar_slope;
-wire signed [7:0] effective_bar_slope = (abs_bar_slope <= 5) ? 8'sd0 : bar_slope;
+wire signed [7:0] effective_bar_slope = (abs_bar_slope <= 3) ? 8'sd0 : bar_slope;
 
 wire signed [15:0] vel_acc  = vel_x + {{8{effective_bar_slope[7]}}, effective_bar_slope};
 
