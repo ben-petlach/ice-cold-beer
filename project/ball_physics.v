@@ -18,6 +18,7 @@
 module ball_physics (
     input  wire       clk,
     input  wire       rst,
+    input  wire       ball_event,   // 1-cycle pulse: reset ball to centre
     input  wire       tick_60hz,
     input  wire [2:0] game_state,
     input  wire [6:0] bar_left_y,
@@ -30,8 +31,8 @@ localparam S_PLAYING = 3'b001;
 
 // 8.8 fixed-point position constants
 localparam [15:0] POS_INIT = 16'd20224;  // 79  * 256  bar centre
-localparam [15:0] POS_MIN  = 16'd10240;  // 40  * 256  left  clamp
-localparam [15:0] POS_MAX  = 16'd30208;  // 118 * 256  right clamp
+localparam [15:0] POS_MIN  = 16'd10752;  // 42  * 256  left  clamp (3 px from wall at 39)
+localparam [15:0] POS_MAX  = 16'd29696;  // 116 * 256  right clamp (3 px from wall at 119)
 
 reg [15:0]        pos_x;
 reg signed [15:0] vel_x;
@@ -68,7 +69,7 @@ wire hit_right = (pos_next >= $signed({1'b0, POS_MAX}));
 // Sequential update
 // ---------------------------------------------------------------------------
 always @(posedge clk) begin
-    if (rst || game_state != S_PLAYING) begin
+    if (rst || ball_event || game_state != S_PLAYING) begin
         pos_x <= POS_INIT;
         vel_x <= 16'sd0;
     end else if (tick_60hz) begin

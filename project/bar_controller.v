@@ -10,6 +10,7 @@ module bar_controller #(
 )(
     input  wire        clk,          // 25 MHz system clock
     input  wire        rst,          // Synchronous active-high reset
+    input  wire        ball_event,   // 1-cycle pulse: reset bar to START_Y
     input  wire        en,           // Enable movement
     input  wire        tick_60hz,    // 1-cycle enable pulse at 60Hz
     input  wire [1:0]  joy_left,     // 2-bit left joystick (10=UP, 01=DOWN)
@@ -45,7 +46,7 @@ module bar_controller #(
                                  (proposed_right_y > max_right_y) ? max_right_y : proposed_right_y;
 
     always @(posedge clk) begin
-        if (rst) begin
+        if (rst || ball_event) begin
             bar_left_y <= START_Y;
             bar_right_y <= START_Y;
         end else if (tick_60hz && en) begin

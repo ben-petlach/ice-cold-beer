@@ -6,12 +6,13 @@
 // hole_positions.vh for collision coordinates.
 //
 // Inputs
-//   key_start  — active-high edge: start game (from START_MENU) or restart (from GAME_OVER)
+//   key_hole      — active-high edge: debug key, simulates sinking the target hole
+//   key_ball_lost — active-high edge: debug key, simulates losing a ball
 //   ball_x/y   — ball centre in game coordinates (0-159 / 0-119)
 //   ball_lost  — active-high pulse: ball fell past the bar (from ball_physics)
 //
 // Outputs
-//   game_state      — S_START_MENU / S_PLAYING / S_GAME_OVER
+//   game_state      — S_PLAYING / S_GAME_OVER
 //   level           — current level (0-3)
 //   balls_remaining — balls left (0-3)
 //   score           — number of holes sunk this game
@@ -21,7 +22,8 @@
 module game_state_machine (
     input  wire        clk,
     input  wire        rst,
-    input  wire        key_start,       // active-high; edge-detected internally
+    input  wire        key_hole,        // active-high; edge-detected: simulate target hole sunk
+    input  wire        key_ball_lost,   // active-high; edge-detected: simulate ball lost
     input  wire [7:0]  ball_x,          // ball centre, game coords
     input  wire [6:0]  ball_y,
     input  wire        ball_lost,       // active-high pulse: ball fell past bar
@@ -30,13 +32,13 @@ module game_state_machine (
     output reg  [3:0]  current_step,
     output reg  [2:0]  balls_remaining,
     output reg  [15:0] score,
-    output wire [5:0]  target_hole_id
+    output wire [5:0]  target_hole_id,
+    output wire        ball_event       // 1-cycle pulse: ball sunk or lost → reset ball + bar
 );
 
 `include "hole_positions.vh"
 `include "level_holes.vh"
 
-localparam S_START_MENU = 3'b000;
 localparam S_PLAYING    = 3'b001;
 localparam S_GAME_OVER  = 3'b010;
 
@@ -59,40 +61,37 @@ wire in_hole = (ball_x >= tgt_x + 8'd2) && (ball_x <= tgt_x + 8'd5) &&
 reg in_hole_prev;
 wire hole_entered = in_hole && !in_hole_prev;
 
-// Edge detect on key_start to avoid holding button triggering multiple transitions
-reg key_prev;
-wire key_edge = key_start && !key_prev;
+// Ball event: fires one cycle on any hole-sink or ball-lost — used to reset ball + bar
+assign ball_event = (game_state == S_PLAYING) &&
+                    (hole_entered || key_hole_edge || ball_lost || key_ball_lost_edge);
+
+// Edge detect on debug keys to avoid held-button repeats
+reg key_hole_prev, key_ball_lost_prev;
+wire key_hole_edge      = key_hole      && !key_hole_prev;
+wire key_ball_lost_edge = key_ball_lost && !key_ball_lost_prev;
 
 // ---------------------------------------------------------------------------
 // State machine
 // ---------------------------------------------------------------------------
 always @(posedge clk) begin
     if (rst) begin
-        game_state      <= S_START_MENU;
-        level           <= 4'd0;
-        current_step    <= 4'd0;
-        balls_remaining <= 3'd6;
-        score           <= 16'd0;
-        in_hole_prev    <= 1'b0;
-        key_prev        <= 1'b0;
+        game_state           <= S_PLAYING;
+        level                <= 4'd0;
+        current_step         <= 4'd0;
+        balls_remaining      <= 3'd6;
+        score                <= 16'd0;
+        in_hole_prev         <= 1'b0;
+        key_hole_prev        <= 1'b0;
+        key_ball_lost_prev   <= 1'b0;
     end else begin
-        in_hole_prev <= in_hole;
-        key_prev     <= key_start;
+        in_hole_prev       <= in_hole;
+        key_hole_prev      <= key_hole;
+        key_ball_lost_prev <= key_ball_lost;
 
         case (game_state)
 
-            S_START_MENU: begin
-                if (key_edge) begin
-                    game_state      <= S_PLAYING;
-                    level           <= 4'd0;
-                    current_step    <= 4'd0;
-                    balls_remaining <= 3'd6;
-                    score           <= 16'd0;
-                end
-            end
-
             S_PLAYING: begin
-                if (hole_entered) begin
+                if (hole_entered || key_hole_edge) begin
                     score <= score + 16'd1;
                     if (current_step == 4'd9) begin
                         // Completed all 10 holes in this level
@@ -104,7 +103,7 @@ always @(posedge clk) begin
                     end else begin
                         current_step <= current_step + 4'd1;
                     end
-                end else if (ball_lost) begin
+                end else if (ball_lost || key_ball_lost_edge) begin
                     if (balls_remaining == 3'd1) begin
                         balls_remaining <= 3'd0;
                         game_state      <= S_GAME_OVER;
@@ -115,11 +114,10 @@ always @(posedge clk) begin
             end
 
             S_GAME_OVER: begin
-                if (key_edge)
-                    game_state <= S_START_MENU;
+                // Exit via SW[9] hard reset only
             end
 
-            default: game_state <= S_START_MENU;
+            default: game_state <= S_PLAYING;
 
         endcase
     end
