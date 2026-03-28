@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deploy
+ date="2026.03.28.14:12:55"
+ outputDirectory="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/">
+ <perimeter>
+  <parameter
+     name="AUTO_GENERATION_ID"
+     type="Integer"
+     defaultValue="0"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_UNIQUE_ID"
+     type="String"
+     defaultValue=""
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_FAMILY"
+     type="String"
+     defaultValue="MAX 10"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE"
+     type="String"
+     defaultValue="10M50DAF484C6GES"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_DEVICE_SPEEDGRADE"
+     type="String"
+     defaultValue="6"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK_CLOCK_RATE"
+     type="Long"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK_CLOCK_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <parameter
+     name="AUTO_CLK_RESET_DOMAIN"
+     type="Integer"
+     defaultValue="-1"
+     onHdl="0"
+     affectsHdl="1" />
+  <interface name="adc_0_adc_slave" kind="avalon" start="0">
+   <property name="addressAlignment" value="DYNAMIC" />
+   <property name="addressGroup" value="0" />
+   <property name="addressSpan" value="32" />
+   <property name="addressUnits" value="WORDS" />
+   <property name="alwaysBurstMaxBurst" value="false" />
+   <property name="associatedClock" value="clk" />
+   <property name="associatedReset" value="reset" />
+   <property name="bitsPerSymbol" value="8" />
+   <property name="bridgedAddressOffset" value="0" />
+   <property name="bridgesToMaster" value="" />
+   <property name="burstOnBurstBoundariesOnly" value="false" />
+   <property name="burstcountUnits" value="WORDS" />
+   <property name="constantBurstBehavior" value="false" />
+   <property name="explicitAddressSpan" value="0" />
+   <property name="holdTime" value="0" />
+   <property name="interleaveBursts" value="false" />
+   <property name="isBigEndian" value="false" />
+   <property name="isFlash" value="false" />
+   <property name="isMemoryDevice" value="false" />
+   <property name="isNonVolatileStorage" value="false" />
+   <property name="linewrapBursts" value="false" />
+   <property name="maximumPendingReadTransactions" value="0" />
+   <property name="maximumPendingWriteTransactions" value="0" />
+   <property name="minimumUninterruptedRunLength" value="1" />
+   <property name="printableDevice" value="false" />
+   <property name="readLatency" value="0" />
+   <property name="readWaitStates" value="1" />
+   <property name="readWaitTime" value="1" />
+   <property name="registerIncomingSignals" value="false" />
+   <property name="registerOutgoingSignals" value="false" />
+   <property name="setupTime" value="0" />
+   <property name="timingUnits" value="Cycles" />
+   <property name="transparentBridge" value="false" />
+   <property name="wellBehavedWaitrequest" value="false" />
+   <property name="writeLatency" value="0" />
+   <property name="writeWaitStates" value="0" />
+   <property name="writeWaitTime" value="0" />
+   <port name="adc_0_adc_slave_write" direction="input" role="write" width="1" />
+   <port
+       name="adc_0_adc_slave_readdata"
+       direction="output"
+       role="readdata"
+       width="32" />
+   <port
+       name="adc_0_adc_slave_writedata"
+       direction="input"
+       role="writedata"
+       width="32" />
+   <port
+       name="adc_0_adc_slave_address"
+       direction="input"
+       role="address"
+       width="3" />
+   <port
+       name="adc_0_adc_slave_waitrequest"
+       direction="output"
+       role="waitrequest"
+       width="1" />
+   <port name="adc_0_adc_slave_read" direction="input" role="read" width="1" />
+  </interface>
+  <interface name="clk" kind="clock" start="0">
+   <property name="clockRate" value="50000000" />
+   <property name="externallyDriven" value="false" />
+   <property name="ptfSchematicName" value="" />
+   <port name="clk_clk" direction="input" role="clk" width="1" />
+  </interface>
+  <interface name="reset" kind="reset" start="0">
+   <property name="associatedClock" value="" />
+   <property name="synchronousEdges" value="NONE" />
+   <port name="reset_reset_n" direction="input" role="reset_n" width="1" />
+  </interface>
+ </perimeter>
+ <entity
+   path=""
+   parameterizationKey="joystick_adc:1.0:AUTO_CLK_CLOCK_DOMAIN=-1,AUTO_CLK_CLOCK_RATE=-1,AUTO_CLK_RESET_DOMAIN=-1,AUTO_DEVICE=10M50DAF484C6GES,AUTO_DEVICE_FAMILY=MAX 10,AUTO_DEVICE_SPEEDGRADE=6,AUTO_GENERATION_ID=1774721564,AUTO_UNIQUE_ID=(altera_up_avalon_adc:18.0:AUTO_CLK_CLOCK_RATE=50000000,AUTO_DEVICE_FAMILY=MAX 10,board=DE10-Lite,board_rev=Autodetect,max10plldivby=5,max10pllmultby=1,numch=5,numch_=6,sclk_freq=10.0,tsclk=5)(clock_source:20.1:clockFrequency=50000000,clockFrequencyKnown=true,inputClockFrequency=0,resetSynchronousEdges=NONE)(clock:20.1:)(reset:20.1:)"
+   instancePathKey="joystick_adc"
+   kind="joystick_adc"
+   version="1.0"
+   name="joystick_adc">
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="-1" />
+  <parameter name="AUTO_GENERATION_ID" value="1774721564" />
+  <parameter name="AUTO_DEVICE" value="10M50DAF484C6GES" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="MAX 10" />
+  <parameter name="AUTO_CLK_RESET_DOMAIN" value="-1" />
+  <parameter name="AUTO_CLK_CLOCK_DOMAIN" value="-1" />
+  <parameter name="AUTO_UNIQUE_ID" value="" />
+  <parameter name="AUTO_DEVICE_SPEEDGRADE" value="6" />
+  <generatedFiles>
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/joystick_adc.v"
+       type="VERILOG" />
+  </generatedFiles>
+  <childGeneratedFiles>
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_up_avalon_adv_adc.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_control.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_control_avrg_fifo.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_control_fsm.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_sample_store.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_sample_store_ram.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_sequencer.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_sequencer_csr.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_sequencer_ctrl.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/chsel_code_converter_sw_to_hw.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/DE10_Lite_ADC_Core_modular_adc_0.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/fiftyfivenm_adcblock_primitive_wrapper.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/fiftyfivenm_adcblock_top_wrapper.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/joystick_adc_adc_0.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_reset_controller.v"
+       type="VERILOG"
+       attributes="" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_reset_synchronizer.v"
+       type="VERILOG"
+       attributes="" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_reset_controller.sdc"
+       type="SDC"
+       attributes="" />
+  </childGeneratedFiles>
+  <sourceFiles>
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc.qsys" />
+  </sourceFiles>
+  <childSourceFiles>
+   <file
+       path="C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/altera_up_avalon_adc_hw.tcl" />
+   <file
+       path="C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/altera_up_avalon_adv_adc.v" />
+   <file
+       path="C:/intelfpga_lite/20.1/ip/altera/merlin/altera_reset_controller/altera_reset_controller_hw.tcl" />
+  </childSourceFiles>
+  <messages>
+   <message level="Debug" culprit="joystick_adc">queue size: 0 starting:joystick_adc "joystick_adc"</message>
+   <message level="Progress" culprit="min"></message>
+   <message level="Progress" culprit="max"></message>
+   <message level="Progress" culprit="current"></message>
+   <message level="Debug">Transform: CustomInstructionTransform</message>
+   <message level="Debug">No custom instruction connections, skipping transform </message>
+   <message level="Debug" culprit="merlin_custom_instruction_transform"><![CDATA[After transform: <b>2</b> modules, <b>2</b> connections]]></message>
+   <message level="Debug">Transform: MMTransform</message>
+   <message level="Debug">Transform: InterruptMapperTransform</message>
+   <message level="Debug">Transform: InterruptSyncTransform</message>
+   <message level="Debug">Transform: InterruptFanoutTransform</message>
+   <message level="Debug">Transform: AvalonStreamingTransform</message>
+   <message level="Debug">Transform: ResetAdaptation</message>
+   <message level="Progress" culprit="min"></message>
+   <message level="Progress" culprit="max"></message>
+   <message level="Progress" culprit="current"></message>
+   <message level="Debug" culprit="reset_adaptation_transform"><![CDATA[After transform: <b>3</b> modules, <b>4</b> connections]]></message>
+   <message level="Debug" culprit="joystick_adc"><![CDATA["<b>joystick_adc</b>" reuses <b>altera_up_avalon_adc</b> "<b>submodules/joystick_adc_adc_0</b>"]]></message>
+   <message level="Debug" culprit="joystick_adc"><![CDATA["<b>joystick_adc</b>" reuses <b>altera_reset_controller</b> "<b>submodules/altera_reset_controller</b>"]]></message>
+   <message level="Debug" culprit="joystick_adc">queue size: 1 starting:altera_up_avalon_adc "submodules/joystick_adc_adc_0"</message>
+   <message level="Info" culprit="adc_0">Starting Generation of ADC Controller for DE-series Board</message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_control.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_control_avrg_fifo.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control_avrg_fifo.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_control_fsm.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control_fsm.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_sample_store.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sample_store.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_sample_store_ram.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sample_store_ram.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_sequencer.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_sequencer_csr.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer_csr.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_sequencer_ctrl.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer_ctrl.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>chsel_code_converter_sw_to_hw.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/chsel_code_converter_sw_to_hw.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>DE10_Lite_ADC_Core_modular_adc_0.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/DE10_Lite_ADC_Core_modular_adc_0.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>fiftyfivenm_adcblock_primitive_wrapper.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/fiftyfivenm_adcblock_primitive_wrapper.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>fiftyfivenm_adcblock_top_wrapper.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/fiftyfivenm_adcblock_top_wrapper.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Info" culprit="adc_0">C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/altera_up_avalon_adv_adc.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control_avrg_fifo.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control_fsm.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sample_store.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sample_store_ram.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer_csr.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer_ctrl.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/chsel_code_converter_sw_to_hw.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/DE10_Lite_ADC_Core_modular_adc_0.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/fiftyfivenm_adcblock_primitive_wrapper.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/fiftyfivenm_adcblock_top_wrapper.v C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0002_sopcgen/joystick_adc_adc_0.v</message>
+   <message level="Debug">set ALTERA_HW_TCL_KEEP_TEMP_FILES=1 to retain temp files</message>
+   <message level="Debug">Command: C:/intelfpga_lite/20.1/quartus\bin64/quartus_sh.exe -t C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0003_sopcqmap/not_a_project_setup.tcl</message>
+   <message level="Debug">Command: C:/intelfpga_lite/20.1/quartus\bin64/quartus_map.exe not_a_project --generate_hdl_interface=C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0002_sopcgen/joystick_adc_adc_0.v --set=HDL_INTERFACE_OUTPUT_PATH=C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0003_sopcqmap/ --ini=disable_check_quartus_compatibility_qsys_only=on</message>
+   <message level="Debug">Command took 2.266s</message>
+   <message level="Debug">Command took 2.458s</message>
+   <message level="Debug">set ALTERA_HW_TCL_KEEP_TEMP_FILES=1 to retain temp files</message>
+   <message level="Debug">Command: C:/intelfpga_lite/20.1/quartus\bin64/quartus_sh.exe -t C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0004_sopcqmap/not_a_project_setup.tcl</message>
+   <message level="Debug">Command: C:/intelfpga_lite/20.1/quartus\bin64/quartus_map.exe not_a_project --generate_hdl_interface=C:\Users\Ben\AppData\Local\Temp\alt0540_8118391853196086397.dir\0002_sopcgen\joystick_adc_adc_0.v --set=HDL_INTERFACE_OUTPUT_PATH=C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0004_sopcqmap/ --set=HDL_INTERFACE_INSTANCE_NAME=inst --set=HDL_INTERFACE_INSTANCE_ENTITY=joystick_adc_adc_0 "--set=HDL_INTERFACE_INSTANCE_PARAMETERS=board=S\"DE10-Lite\";board_rev=S\"Autodetect\";tsclk=D\"5\";numch=D\"5\";max10pllmultby=D\"1\";max10plldivby=D\"5\";" --ini=disable_check_quartus_compatibility_qsys_only=on</message>
+   <message level="Debug">Command took 1.186s</message>
+   <message level="Debug">Command took 1.241s</message>
+   <message level="Info" culprit="adc_0"><![CDATA["<b>joystick_adc</b>" instantiated <b>altera_up_avalon_adc</b> "<b>adc_0</b>"]]></message>
+   <message level="Debug" culprit="joystick_adc">queue size: 0 starting:altera_reset_controller "submodules/altera_reset_controller"</message>
+   <message level="Info" culprit="rst_controller"><![CDATA["<b>joystick_adc</b>" instantiated <b>altera_reset_controller</b> "<b>rst_controller</b>"]]></message>
+  </messages>
+ </entity>
+ <entity
+   path="submodules/"
+   parameterizationKey="altera_up_avalon_adc:18.0:AUTO_CLK_CLOCK_RATE=50000000,AUTO_DEVICE_FAMILY=MAX 10,board=DE10-Lite,board_rev=Autodetect,max10plldivby=5,max10pllmultby=1,numch=5,numch_=6,sclk_freq=10.0,tsclk=5"
+   instancePathKey="joystick_adc:.:adc_0"
+   kind="altera_up_avalon_adc"
+   version="18.0"
+   name="joystick_adc_adc_0">
+  <parameter name="AUTO_CLK_CLOCK_RATE" value="50000000" />
+  <parameter name="AUTO_DEVICE_FAMILY" value="MAX 10" />
+  <parameter name="max10plldivby" value="5" />
+  <parameter name="tsclk" value="5" />
+  <parameter name="sclk_freq" value="10.0" />
+  <parameter name="numch_" value="6" />
+  <parameter name="board_rev" value="Autodetect" />
+  <parameter name="max10pllmultby" value="1" />
+  <parameter name="board" value="DE10-Lite" />
+  <parameter name="numch" value="5" />
+  <generatedFiles>
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_up_avalon_adv_adc.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_control.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_control_avrg_fifo.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_control_fsm.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_sample_store.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_sample_store_ram.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_sequencer.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_sequencer_csr.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_modular_adc_sequencer_ctrl.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/chsel_code_converter_sw_to_hw.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/DE10_Lite_ADC_Core_modular_adc_0.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/fiftyfivenm_adcblock_primitive_wrapper.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/fiftyfivenm_adcblock_top_wrapper.v"
+       type="VERILOG" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/joystick_adc_adc_0.v"
+       type="VERILOG" />
+  </generatedFiles>
+  <childGeneratedFiles/>
+  <sourceFiles>
+   <file
+       path="C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/altera_up_avalon_adc_hw.tcl" />
+   <file
+       path="C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/altera_up_avalon_adv_adc.v" />
+  </sourceFiles>
+  <childSourceFiles/>
+  <instantiator instantiator="joystick_adc" as="adc_0" />
+  <messages>
+   <message level="Debug" culprit="joystick_adc">queue size: 1 starting:altera_up_avalon_adc "submodules/joystick_adc_adc_0"</message>
+   <message level="Info" culprit="adc_0">Starting Generation of ADC Controller for DE-series Board</message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_control.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_control_avrg_fifo.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control_avrg_fifo.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_control_fsm.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control_fsm.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_sample_store.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sample_store.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_sample_store_ram.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sample_store_ram.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_sequencer.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_sequencer_csr.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer_csr.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>altera_modular_adc_sequencer_ctrl.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer_ctrl.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>chsel_code_converter_sw_to_hw.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/chsel_code_converter_sw_to_hw.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>DE10_Lite_ADC_Core_modular_adc_0.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/DE10_Lite_ADC_Core_modular_adc_0.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>fiftyfivenm_adcblock_primitive_wrapper.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/fiftyfivenm_adcblock_primitive_wrapper.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> from generate callback added file <b>fiftyfivenm_adcblock_top_wrapper.v</b> with wrong prefix; use [get_generation_property output_name] to get correct prefix]]></message>
+   <message level="Warning" culprit="adc_0"><![CDATA[<b>add_file</b> on static file <b>C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/fiftyfivenm_adcblock_top_wrapper.v</b> from generate callback is unsafe; add static files from main program]]></message>
+   <message level="Info" culprit="adc_0">C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/altera_up_avalon_adv_adc.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control_avrg_fifo.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_control_fsm.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sample_store.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sample_store_ram.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer_csr.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/altera_modular_adc_sequencer_ctrl.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/chsel_code_converter_sw_to_hw.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/DE10_Lite_ADC_Core_modular_adc_0.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/fiftyfivenm_adcblock_primitive_wrapper.v C:/intelfpga_lite/20.1/ip/altera/university_program/input_output/altera_up_avalon_adc/hdl/de10/fiftyfivenm_adcblock_top_wrapper.v C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0002_sopcgen/joystick_adc_adc_0.v</message>
+   <message level="Debug">set ALTERA_HW_TCL_KEEP_TEMP_FILES=1 to retain temp files</message>
+   <message level="Debug">Command: C:/intelfpga_lite/20.1/quartus\bin64/quartus_sh.exe -t C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0003_sopcqmap/not_a_project_setup.tcl</message>
+   <message level="Debug">Command: C:/intelfpga_lite/20.1/quartus\bin64/quartus_map.exe not_a_project --generate_hdl_interface=C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0002_sopcgen/joystick_adc_adc_0.v --set=HDL_INTERFACE_OUTPUT_PATH=C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0003_sopcqmap/ --ini=disable_check_quartus_compatibility_qsys_only=on</message>
+   <message level="Debug">Command took 2.266s</message>
+   <message level="Debug">Command took 2.458s</message>
+   <message level="Debug">set ALTERA_HW_TCL_KEEP_TEMP_FILES=1 to retain temp files</message>
+   <message level="Debug">Command: C:/intelfpga_lite/20.1/quartus\bin64/quartus_sh.exe -t C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0004_sopcqmap/not_a_project_setup.tcl</message>
+   <message level="Debug">Command: C:/intelfpga_lite/20.1/quartus\bin64/quartus_map.exe not_a_project --generate_hdl_interface=C:\Users\Ben\AppData\Local\Temp\alt0540_8118391853196086397.dir\0002_sopcgen\joystick_adc_adc_0.v --set=HDL_INTERFACE_OUTPUT_PATH=C:/Users/Ben/AppData/Local/Temp/alt0540_8118391853196086397.dir/0004_sopcqmap/ --set=HDL_INTERFACE_INSTANCE_NAME=inst --set=HDL_INTERFACE_INSTANCE_ENTITY=joystick_adc_adc_0 "--set=HDL_INTERFACE_INSTANCE_PARAMETERS=board=S\"DE10-Lite\";board_rev=S\"Autodetect\";tsclk=D\"5\";numch=D\"5\";max10pllmultby=D\"1\";max10plldivby=D\"5\";" --ini=disable_check_quartus_compatibility_qsys_only=on</message>
+   <message level="Debug">Command took 1.186s</message>
+   <message level="Debug">Command took 1.241s</message>
+   <message level="Info" culprit="adc_0"><![CDATA["<b>joystick_adc</b>" instantiated <b>altera_up_avalon_adc</b> "<b>adc_0</b>"]]></message>
+  </messages>
+ </entity>
+ <entity
+   path="submodules/"
+   parameterizationKey="altera_reset_controller:20.1:ADAPT_RESET_REQUEST=0,MIN_RST_ASSERTION_TIME=3,NUM_RESET_INPUTS=1,OUTPUT_RESET_SYNC_EDGES=deassert,RESET_REQUEST_PRESENT=0,RESET_REQ_EARLY_DSRT_TIME=1,RESET_REQ_WAIT_TIME=1,SYNC_DEPTH=2,USE_RESET_REQUEST_IN0=0,USE_RESET_REQUEST_IN1=0,USE_RESET_REQUEST_IN10=0,USE_RESET_REQUEST_IN11=0,USE_RESET_REQUEST_IN12=0,USE_RESET_REQUEST_IN13=0,USE_RESET_REQUEST_IN14=0,USE_RESET_REQUEST_IN15=0,USE_RESET_REQUEST_IN2=0,USE_RESET_REQUEST_IN3=0,USE_RESET_REQUEST_IN4=0,USE_RESET_REQUEST_IN5=0,USE_RESET_REQUEST_IN6=0,USE_RESET_REQUEST_IN7=0,USE_RESET_REQUEST_IN8=0,USE_RESET_REQUEST_IN9=0,USE_RESET_REQUEST_INPUT=0"
+   instancePathKey="joystick_adc:.:rst_controller"
+   kind="altera_reset_controller"
+   version="20.1"
+   name="altera_reset_controller">
+  <generatedFiles>
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_reset_controller.v"
+       type="VERILOG"
+       attributes="" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_reset_synchronizer.v"
+       type="VERILOG"
+       attributes="" />
+   <file
+       path="C:/Users/Ben/Documents/EECS_3201/ice-cold-beer/joystick_adc/synthesis/submodules/altera_reset_controller.sdc"
+       type="SDC"
+       attributes="" />
+  </generatedFiles>
+  <childGeneratedFiles/>
+  <sourceFiles>
+   <file
+       path="C:/intelfpga_lite/20.1/ip/altera/merlin/altera_reset_controller/altera_reset_controller_hw.tcl" />
+  </sourceFiles>
+  <childSourceFiles/>
+  <instantiator instantiator="joystick_adc" as="rst_controller" />
+  <messages>
+   <message level="Debug" culprit="joystick_adc">queue size: 0 starting:altera_reset_controller "submodules/altera_reset_controller"</message>
+   <message level="Info" culprit="rst_controller"><![CDATA["<b>joystick_adc</b>" instantiated <b>altera_reset_controller</b> "<b>rst_controller</b>"]]></message>
+  </messages>
+ </entity>
+</deploy>
