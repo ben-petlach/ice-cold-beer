@@ -104,7 +104,7 @@ wire [31:0] adc_readdata;
 wire        adc_waitrequest;
 
 joystick_adc adc_ip (
-    .clk_clk                     (vga_clk),
+    .clk_clk                     (MAX10_CLK1_50),
     .reset_reset_n               (~rst),
     .adc_0_adc_slave_write       (adc_write),
     .adc_0_adc_slave_writedata   (adc_writedata),
@@ -118,10 +118,10 @@ wire [1:0] joy_left_sig;
 wire [1:0] joy_right_sig;
 
 joystick_adc_reader #(
-    .THRESH_HIGH (12'd3352),   // > 2.7 V at 12-bit resolution
-    .THRESH_LOW  (12'd2482)    // < 2.0 V at 12-bit resolution
+    .THRESH_HIGH (12'd3352),   // > 2.7 V (Joystick DOWN on 5V supply)
+    .THRESH_LOW  (12'd2482)    // < 2.0 V (Joystick UP on 5V supply)
 ) adc_reader (
-    .clk             (vga_clk),
+    .clk             (MAX10_CLK1_50),
     .rst             (rst),
     .adc_write       (adc_write),
     .adc_writedata   (adc_writedata),
