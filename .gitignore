@@ -4,6 +4,9 @@ db/
 incremental_db/
 qar_info.json
 
+# Context
+context/
+
 # Quartus project backup / auto-save
 *.qws
 *.bak

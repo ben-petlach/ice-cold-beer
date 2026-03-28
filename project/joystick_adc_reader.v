@@ -44,12 +44,11 @@ module joystick_adc_reader #(
 localparam S_IDLE      = 3'd0;
 localparam S_WR_CMD    = 3'd1;   // write channel index to addr 0
 localparam S_WAIT_WR   = 3'd2;   // hold write until waitrequest deasserts
-localparam S_RD_REQ    = 3'd3;   // assert read to addr 1
-localparam S_WAIT_RD   = 3'd4;   // hold read until waitrequest deasserts
-localparam S_STORE     = 3'd5;   // latch result, toggle channel
+localparam S_RD_REQ    = 3'd3;   // assert read to address based on channel
+localparam S_WAIT_RD   = 3'd4;   // hold read until waitrequest deasserts, sample data
 
 reg [2:0] state;
-reg       current_ch;   // 0 = left joystick (ADC ch0), 1 = right (ADC ch1)
+reg       current_ch;   // 0 = left joystick (ADC Address 1), 1 = right (ADC Address 2)
 
 // ---------------------------------------------------------------------------
 // Decode 12-bit ADC reading → 2-bit direction
@@ -110,33 +109,30 @@ always @(posedge clk) begin
             end
 
             // -----------------------------------------------------------------
-            // Issue a read to address 1 to retrieve the conversion result.
+            // Issue a read to the appropriate channel address to retrieve the result.
+            // Address 1 corresponds to Channel 1 (Arduino A0).
+            // Address 2 corresponds to Channel 2 (Arduino A1).
             // -----------------------------------------------------------------
             S_RD_REQ: begin
                 adc_read    <= 1'b1;
-                adc_address <= 3'd1;
+                adc_address <= current_ch ? 3'd2 : 3'd1; // Address 1 or 2
                 state       <= S_WAIT_RD;
             end
 
             // -----------------------------------------------------------------
+            // Wait for waitrequest=0, latch data, then switch channel.
+            // -----------------------------------------------------------------
             S_WAIT_RD: begin
                 if (!adc_waitrequest) begin
                     adc_read <= 1'b0;
-                    state    <= S_STORE;
+                    if (current_ch == 1'b0)
+                        joy_left  <= decode_joy(adc_readdata[11:0]);
+                    else
+                        joy_right <= decode_joy(adc_readdata[11:0]);
+
+                    current_ch <= ~current_ch; // alternate channels
+                    state      <= S_IDLE;
                 end
-            end
-
-            // -----------------------------------------------------------------
-            // Latch & decode the result, then switch to the other channel.
-            // -----------------------------------------------------------------
-            S_STORE: begin
-                if (current_ch == 1'b0)
-                    joy_left  <= decode_joy(adc_readdata[11:0]);
-                else
-                    joy_right <= decode_joy(adc_readdata[11:0]);
-
-                current_ch <= ~current_ch;   // alternate channels
-                state      <= S_IDLE;
             end
 
             default: state <= S_IDLE;

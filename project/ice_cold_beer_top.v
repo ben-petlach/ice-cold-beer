@@ -118,9 +118,9 @@ wire [1:0] joy_left_sig;
 wire [1:0] joy_right_sig;
 
 joystick_adc_reader #(
-	 .THRESH_HIGH (12'd837),   // > 2.7 V at 10-bit resolution
-    .THRESH_LOW  (12'd620) 	// < 2.0 V at 10-bit resolution
-)adc_reader (
+    .THRESH_HIGH (12'd3352),   // > 2.7 V at 12-bit resolution
+    .THRESH_LOW  (12'd2482)    // < 2.0 V at 12-bit resolution
+) adc_reader (
     .clk             (vga_clk),
     .rst             (rst),
     .adc_write       (adc_write),
