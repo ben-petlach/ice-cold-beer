@@ -32,6 +32,7 @@
 
 module ice_cold_beer_top (
     input  wire        MAX10_CLK1_50,
+    input  wire        MAX10_CLK2_50,
 
     input  wire [1:0]  KEY,          // KEY[0] = skip hole (active-low)
                                      // KEY[1] = lose ball  (active-low)
@@ -104,7 +105,7 @@ wire [31:0] adc_readdata;
 wire        adc_waitrequest;
 
 joystick_adc adc_ip (
-    .clk_clk                     (MAX10_CLK1_50),
+    .clk_clk                     (MAX10_CLK2_50),
     .reset_reset_n               (~rst),
     .adc_0_adc_slave_write       (adc_write),
     .adc_0_adc_slave_writedata   (adc_writedata),
@@ -121,7 +122,7 @@ joystick_adc_reader #(
     .THRESH_HIGH (12'd3352),   // > 2.7 V (Joystick DOWN on 5V supply)
     .THRESH_LOW  (12'd2482)    // < 2.0 V (Joystick UP on 5V supply)
 ) adc_reader (
-    .clk             (MAX10_CLK1_50),
+    .clk             (MAX10_CLK2_50),
     .rst             (rst),
     .adc_write       (adc_write),
     .adc_writedata   (adc_writedata),

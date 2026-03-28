@@ -25,6 +25,8 @@ set_global_assignment -name BOARD "MAX 10 DE10 - Lite"
 # -------------------------------------------------------------------------- #
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MAX10_CLK1_50
 set_location_assignment PIN_P11 -to MAX10_CLK1_50
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to MAX10_CLK2_50
+set_location_assignment PIN_N14 -to MAX10_CLK2_50
 
 # -------------------------------------------------------------------------- #
 # Keys (active-low push buttons)
