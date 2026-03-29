@@ -12,31 +12,34 @@
 //   vga_clk + rst + h_cnt/v_cnt/blank_n + game signals
 //       └─► vga_renderer         → vga_r, vga_g, vga_b → VGA_R/G/B[3:0]
 //
+//   vga_clk + rst
+//       └─► joystick_adc         → Avalon-MM ADC IP (ch0 = left, ch1 = right)
+//       └─► joystick_adc_reader  → joy_left[1:0], joy_right[1:0]
+//
 // Unwritten modules (stubbed with wire/reg defaults below):
 //   - game_state_machine  (controls game_state, balls_remaining, score, level)
 //   - ball_physics        (updates ball_x, ball_y each game tick)
-//   - bar_tilt_ctrl       (maps tilt input → bar_left_y, bar_right_y)
 //   - hole_collision      (detects ball entering target hole → signals FSM)
 //
-// Tilt input (interim):
-//   SW[0] pressed → left  end of bar moves down (bar_left_y  increases)
-//   SW[1] pressed → right end of bar moves down (bar_right_y increases)
-//   Replace SW-based stubs with bar_tilt_ctrl once that module is written.
+// Joystick input (ADC):
+//   ADC ch0 (left  joystick): > 2.7 V → DOWN (01), < 2.0 V → UP (10)
+//   ADC ch1 (right joystick): > 2.7 V → DOWN (01), < 2.0 V → UP (10)
+//   Thresholds assume Vref = 3.3 V, 12-bit ADC (full-scale 4095).
 //
 // Reset:
-//   KEY[0] (active-low) = user reset.  Also held in reset until PLL locks.
+//   SW[9] active-high = user reset.  Also held in reset until PLL locks.
 // =============================================================================
 
 module ice_cold_beer_top (
     input  wire        MAX10_CLK1_50,
 
-    input  wire [1:0]  KEY,          // KEY[0] = reset (active-low)
-                                     // KEY[1] = start / restart
-    input  wire [9:0]  SW,           // SW[1:0] = tilt (interim, see above)
+    input  wire [1:0]  KEY,          // KEY[0] = skip hole (active-low)
+                                     // KEY[1] = lose ball  (active-low)
+    input  wire [9:0]  SW,           // SW[9] = reset (active-high)
 
     output wire [9:0]  LEDR,         // balls_remaining shown on LEDs
 
-    output wire [7:0]  HEX0,         // score  ones digit  (BCD 7-seg, active-low; [7]=decimal point, tie high)
+    output wire [7:0]  HEX0,         // score  ones digit  (BCD 7-seg, active-low)
     output wire [7:0]  HEX1,         // score  tens digit
     output wire [7:0]  HEX2,         // score  hundreds
     output wire [7:0]  HEX3,         // score  thousands
@@ -57,19 +60,17 @@ wire vga_clk;
 wire pll_locked;
 
 vga_pll pll (
-    .areset (1'b0),           // never reset PLL after power-on
+    .areset (1'b0),
     .inclk0 (MAX10_CLK1_50),
     .c0     (vga_clk),
     .locked (pll_locked)
 );
 
-// Active-high synchronous reset: hold until PLL is locked or KEY[0] pressed
-wire rst = ~pll_locked | SW[9];    // SW[9] active-high reset; KEY[0] now a debug input
+// Active-high synchronous reset: hold until PLL locked or SW[9] asserted
+wire rst = ~pll_locked | SW[9];
 
 // ---------------------------------------------------------------------------
 // 2.  VGA sync generator  —  produces h_cnt, v_cnt, blank_n, HS, VS
-//     All signals are registered; both this module and vga_renderer clock
-//     on the same vga_clk edge, so their outputs stay in lockstep.
 // ---------------------------------------------------------------------------
 wire [10:0] h_cnt;
 wire [9:0]  v_cnt;
@@ -89,13 +90,56 @@ video_sync_generator sync_gen (
 );
 
 // ---------------------------------------------------------------------------
-// 3.  Game signals
-//     Replace each stub with the real module output once written.
+// 3.  ADC joystick interface
+//     joystick_adc        — Altera IP core
+//     joystick_adc_reader — polls ch0/ch1, decodes to 2-bit joy signals
+// ---------------------------------------------------------------------------
+
+// Avalon-MM wires between joystick_adc_reader (master) and joystick_adc (slave)
+wire        adc_write;
+wire [31:0] adc_writedata;
+wire [2:0]  adc_address;
+wire        adc_read;
+wire [31:0] adc_readdata;
+wire        adc_waitrequest;
+
+joystick_adc adc_ip (
+    .clk_clk                     (vga_clk),
+    .reset_reset_n               (~rst),
+    .adc_0_adc_slave_write       (adc_write),
+    .adc_0_adc_slave_writedata   (adc_writedata),
+    .adc_0_adc_slave_address     (adc_address),
+    .adc_0_adc_slave_read        (adc_read),
+    .adc_0_adc_slave_readdata    (adc_readdata),
+    .adc_0_adc_slave_waitrequest (adc_waitrequest)
+);
+
+wire [1:0] joy_left_sig;
+wire [1:0] joy_right_sig;
+
+joystick_adc_reader #(
+    .THRESH_HIGH (12'd2500),   // > 2.0 V 
+    .THRESH_LOW  (12'd1600)    // < 1.3 V 
+) adc_reader (
+    .clk             (vga_clk),
+    .rst             (rst),
+    .adc_write       (adc_write),
+    .adc_writedata   (adc_writedata),
+    .adc_address     (adc_address),
+    .adc_read        (adc_read),
+    .adc_readdata    (adc_readdata),
+    .adc_waitrequest (adc_waitrequest),
+    .joy_left        (joy_left_sig),
+    .joy_right       (joy_right_sig)
+);
+
+// ---------------------------------------------------------------------------
+// 4.  Game signals
 // ---------------------------------------------------------------------------
 
 // --- Ball physics ----------------------------------------------------------
 wire [7:0] ball_x;
-wire [6:0] ball_y   = 7'd60;   // Y computed in renderer from bar; stub here
+wire [6:0] ball_y = 7'd60;   // stub; computed in renderer from bar
 wire       ball_lost;
 
 ball_physics ball_phys (
@@ -110,7 +154,7 @@ ball_physics ball_phys (
     .ball_lost   (ball_lost)
 );
 
-// --- Game state machine ---------------------------------------------------
+// --- Game state machine ----------------------------------------------------
 wire [2:0]  game_state;
 wire [3:0]  level;
 wire [3:0]  current_step;
@@ -122,8 +166,8 @@ wire        ball_event;
 game_state_machine gsm (
     .clk            (vga_clk),
     .rst            (rst),
-    .key_hole       (~KEY[0]),      // KEY[0] active-low → active-high: skip to next hole
-    .key_ball_lost  (~KEY[1]),      // KEY[1] active-low → active-high: lose a ball
+    .key_hole       (~KEY[0]),
+    .key_ball_lost  (~KEY[1]),
     .ball_x         (ball_x),
     .ball_y         (ball_y),
     .ball_lost      (ball_lost),
@@ -140,19 +184,19 @@ game_state_machine gsm (
 wire [9:0] bar_left_y_10, bar_right_y_10;
 
 bar_controller #(
-    .Y_MIN    (10'd20),   // highest allowed game Y
-    .Y_MAX    (10'd110),  // lowest allowed game Y
-    .MAX_DY   (10'd20),   // max tilt difference (game pixels)
-    .BAR_SPEED(1),        // 1 game pixel per 60 Hz tick
-    .START_Y  (10'd110)   // start at bottom of play area
+    .Y_MIN    (10'd20),
+    .Y_MAX    (10'd110),
+    .MAX_DY   (10'd20),
+    .BAR_SPEED(1),
+    .START_Y  (10'd110)
 ) bar_ctrl (
     .clk        (vga_clk),
     .rst        (rst),
     .ball_event (ball_event),
     .en         (1'b1),
     .tick_60hz  (tick_60hz),
-    .joy_left   ({SW[0], SW[1]}),   // SW0=up, SW1=down
-    .joy_right  ({SW[8], SW[7]}),   // SW8=up, SW7=down
+    .joy_left   (joy_left_sig),    // from ADC reader (was SW-based)
+    .joy_right  (joy_right_sig),   // from ADC reader (was SW-based)
     .bar_left_y (bar_left_y_10),
     .bar_right_y(bar_right_y_10)
 );
@@ -161,7 +205,7 @@ wire [6:0] bar_left_y  = bar_left_y_10[6:0];
 wire [6:0] bar_right_y = bar_right_y_10[6:0];
 
 // ---------------------------------------------------------------------------
-// 4.  Pixel renderer
+// 5.  Pixel renderer
 // ---------------------------------------------------------------------------
 wire vga_r, vga_g, vga_b, ball_gray;
 
@@ -188,25 +232,22 @@ vga_renderer renderer (
 );
 
 // ---------------------------------------------------------------------------
-// 5.  VGA DAC  —  1-bit colour → 4-bit resistor ladder (DE10-Lite)
-//     Replicate the single bit across all 4 DAC bits: 0→0000, 1→1111
+// 6.  VGA DAC  —  1-bit colour → 4-bit resistor ladder (DE10-Lite)
 // ---------------------------------------------------------------------------
-// ball_gray = 1 drives ~38% brightness (matches ball.png gray body, rgb 98,98,98)
 assign VGA_R = ball_gray ? 4'h6 : {4{vga_r}};
 assign VGA_G = ball_gray ? 4'h6 : {4{vga_g}};
 assign VGA_B = ball_gray ? 4'h6 : {4{vga_b}};
 
 // ---------------------------------------------------------------------------
-// 6.  Status outputs
+// 7.  Status outputs
 // ---------------------------------------------------------------------------
 
 // LEDs: show balls_remaining (one LED per ball, active-high)
 assign LEDR[2:0] = balls_remaining;
 assign LEDR[9:3] = 7'b0;
 
-// 7-segment displays: tie off for now (all segments off = 7'b111_1111)
-// TODO: wire through a bcd_to_7seg decoder once score/level logic exists
-assign HEX0 = 8'hFF;   // all segments + decimal point off (active-low)
+// 7-segment displays: all off until BCD decoder is wired in
+assign HEX0 = 8'hFF;
 assign HEX1 = 8'hFF;
 assign HEX2 = 8'hFF;
 assign HEX3 = 8'hFF;
