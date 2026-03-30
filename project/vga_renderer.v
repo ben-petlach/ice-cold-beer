@@ -97,6 +97,7 @@ wire ball_spr_hi_px = in_ball_spr && ball_spr_hi_row[3'd6 - ball_spr_col];
 wire [36:0] hole_active;
 wire [36:0] hole_border;
 wire [36:0] hole_is_target;
+wire [36:0] ball_in_center;
 
 genvar i;
 generate
@@ -121,12 +122,19 @@ generate
                                     (dx == 3'd1 && dy == 3'd6) ||
                                     (dx == 3'd6 && dy == 3'd6));
         assign hole_is_target[i] = hole_active[i] && (i[5:0] == target_hole_id);
+        // Ball centre in 4×4 minus corners: dx=[2..5], dy=[2..5], excluding (2,2)(2,5)(5,2)(5,5)
+        assign ball_in_center[i] =
+            (draw_ball_x >= {1'b0, HOLE_X[i]} + 8'd2) && (draw_ball_x <= {1'b0, HOLE_X[i]} + 8'd5) &&
+            (draw_ball_y >= HOLE_Y[i] + 7'd2)          && (draw_ball_y <= HOLE_Y[i] + 7'd5) &&
+            !(  (draw_ball_x == {1'b0, HOLE_X[i]} + 8'd2 || draw_ball_x == {1'b0, HOLE_X[i]} + 8'd5) &&
+                (draw_ball_y == HOLE_Y[i] + 7'd2         || draw_ball_y == HOLE_Y[i] + 7'd5)  );
     end
 endgenerate
 
-wire any_hole      = |hole_active;
-wire any_border    = |hole_border;
-wire target_border = |(hole_border & hole_is_target);
+wire any_hole           = |hole_active;
+wire any_border         = |hole_border;
+wire target_border      = |(hole_border & hole_is_target);
+wire ball_in_hole_border = |(hole_border & ball_in_center);
 
 // ---------------------------------------------------------------------------
 // Background ROM — "ice-cold-beer-monochrome"
@@ -279,7 +287,10 @@ always @(*) begin
 
         end else if (any_hole) begin
             // Layer 6: holes
-            if (target_border) begin
+            if (ball_in_hole_border) begin
+                // Ball entering this hole — red (overrides target yellow)
+                r_next = 1'b1; g_next = 1'b0; b_next = 1'b0;
+            end else if (target_border) begin
                 // Target hole border — yellow
                 r_next = 1'b1; g_next = 1'b1; b_next = 1'b0;
             end else if (any_border) begin

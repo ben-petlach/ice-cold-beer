@@ -67,7 +67,7 @@ vga_pll pll (
 );
 
 // Active-high synchronous reset: hold until PLL locked or SW[9] asserted
-wire rst = ~pll_locked | SW[9];
+wire rst = ~pll_locked | SW[9] | ~KEY[0];   // KEY[0] active-low hard reset
 
 // ---------------------------------------------------------------------------
 // 2.  VGA sync generator  —  produces h_cnt, v_cnt, blank_n, HS, VS
@@ -139,7 +139,7 @@ joystick_adc_reader #(
 
 // --- Ball physics ----------------------------------------------------------
 wire [7:0] ball_x;
-wire [6:0] ball_y = 7'd60;   // stub; computed in renderer from bar
+wire [6:0] ball_y;            // real ball Y from ball_physics bar interpolation
 wire       ball_lost;
 
 ball_physics ball_phys (
@@ -151,6 +151,7 @@ ball_physics ball_phys (
     .bar_left_y  (bar_left_y),
     .bar_right_y (bar_right_y),
     .ball_x      (ball_x),
+    .ball_y      (ball_y),
     .ball_lost   (ball_lost)
 );
 
@@ -166,7 +167,7 @@ wire        ball_event;
 game_state_machine gsm (
     .clk            (vga_clk),
     .rst            (rst),
-    .key_hole       (~KEY[0]),
+    .key_hole       (1'b0),         // KEY[0] is now hard reset; debug skip removed
     .key_ball_lost  (~KEY[1]),
     .ball_x         (ball_x),
     .ball_y         (ball_y),
