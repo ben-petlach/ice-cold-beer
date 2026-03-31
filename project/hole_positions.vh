@@ -1,4 +1,3 @@
-// hole_positions.vh
 // Top-left corners of all holes in 160x120 game-pixel space.
 // Each hole is 8x8 with 3 corner pixels cut from each corner.
 // Collision window: ball center within [HOLE_X+2, HOLE_X+5] x [HOLE_Y+2, HOLE_Y+5]

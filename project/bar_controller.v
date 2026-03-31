@@ -1,6 +1,3 @@
-//BUG: pivots about a point, but the side opposite moves as well
-// ex. if moving the left side up, it will go up, but the right side will also go down a bit. Instead, the bar should "extend" to its max height difference rather than "maintain length", while keeping the side not moving anchored to where it is
-
 module bar_controller #(
     parameter Y_MIN = 60,            // Highest point the bar can reach (minimum Y)
     parameter Y_MAX = 460,           // Lowest point the bar can reach (maximum Y)
@@ -8,11 +5,11 @@ module bar_controller #(
     parameter BAR_SPEED = 2,         // Screen pixels to move per tick
     parameter START_Y = 440          // Initial starting height
 )(
-    input  wire        clk,          // 25 MHz system clock
-    input  wire        rst,          // Synchronous active-high reset
-    input  wire        ball_event,   // 1-cycle pulse: reset bar to START_Y
-    input  wire        en,           // Enable movement
-    input  wire        tick_60hz,    // 1-cycle enable pulse at 60Hz
+    input  wire        clk,          
+    input  wire        rst,          
+    input  wire        ball_event,   // reset bar to START_Y
+    input  wire        en,           
+    input  wire        tick_60hz,    
     input  wire [1:0]  joy_left,     // 2-bit left joystick (10=UP, 01=DOWN)
     input  wire [1:0]  joy_right,    // 2-bit right joystick (10=UP, 01=DOWN)
     

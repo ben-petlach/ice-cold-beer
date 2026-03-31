@@ -1,5 +1,3 @@
-
-
 module video_sync_generator(
     input reset,
     input vga_clk,
@@ -10,7 +8,6 @@ module video_sync_generator(
     output reg [9:0] v_cnt   // Exposed vertical counter
 );
 
-    // VGA timing parameters for 640x480 @ 60Hz
     parameter H_TOTAL = 800;
     parameter H_SYNC_PULSE = 96;
     parameter H_BACK_PORCH = 48;

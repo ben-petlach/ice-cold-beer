@@ -1,4 +1,3 @@
-// level_holes.vh
 // Fixed hole sequences for each level.
 // LEVEL_HOLES[level][step] gives the hole index into HOLE_X / HOLE_Y.
 // step 0 = first target (bottom-most, highest Y); step 9 = last (top-most, lowest Y).
@@ -17,7 +16,6 @@
 localparam LEVEL_COUNT     = 4;
 localparam HOLES_PER_LEVEL = 10;
 
-//                       step: 0   1   2   3   4   5   6   7   8   9
 localparam logic [5:0] LEVEL_HOLES [0:3][0:9] = '{
     /* level 0 */ '{6'd35, 6'd32, 6'd29, 6'd27, 6'd24, 6'd16, 6'd14, 6'd8,  6'd7,  6'd5 },
     /* level 1 */ '{6'd31, 6'd36, 6'd28, 6'd26, 6'd20, 6'd18, 6'd11, 6'd10, 6'd6,  6'd0 },
