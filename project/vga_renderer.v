@@ -17,7 +17,7 @@ module vga_renderer (
     output reg         vga_r,
     output reg         vga_g,
     output reg         vga_b,
-    output reg         ball_gray   // 1 = render this pixel at ~38% brightness (gray body)
+    output reg         ball_gray   
 );
 
 `include "hole_positions.vh"
@@ -26,7 +26,6 @@ module vga_renderer (
 localparam S_PLAYING    = 3'b001;
 localparam S_GAME_OVER  = 3'b010;
 
-// Screen coordinate conversion (VGA hardware signals — unchanged)
 // H: h_cnt active region starts at H_SYNC_PULSE + H_BACK_PORCH = 96+48 = 144
 // V: v_cnt active region starts at V_SYNC_PULSE + V_BACK_PORCH =  2+33 = 35
 wire [9:0] screen_x = h_cnt[9:0] - 10'd160;
