@@ -1,18 +1,8 @@
 module ice_cold_beer_top (
     input  wire        MAX10_CLK1_50,
 
-    input  wire [1:0]  KEY,          // KEY[0] = skip hole (active-low)
-                                     // KEY[1] = lose ball  (active-low)
+    input  wire        KEY,           // KEY = reset (active-low)
     input  wire [9:0]  SW,           // SW[9] = reset (active-high)
-
-    output wire [9:0]  LEDR,         // balls_remaining shown on LEDs
-
-    output wire [7:0]  HEX0,         // score  ones digit  (BCD 7-seg, active-low)
-    output wire [7:0]  HEX1,         // score  tens digit
-    output wire [7:0]  HEX2,         // score  hundreds
-    output wire [7:0]  HEX3,         // score  thousands
-    output wire [7:0]  HEX4,         // level
-    output wire [7:0]  HEX5,         // balls remaining
 
     output wire [3:0]  VGA_R,
     output wire [3:0]  VGA_G,
@@ -31,7 +21,7 @@ vga_pll pll (
     .locked (pll_locked)
 );
 
-wire rst = ~pll_locked | SW[9] | ~KEY[0];  
+wire rst = ~pll_locked | SW[9] | ~KEY;  
 
 wire [10:0] h_cnt;
 wire [9:0]  v_cnt;
@@ -118,8 +108,6 @@ wire        ball_event;
 game_state_machine gsm (
     .clk            (vga_clk),
     .rst            (rst),
-    .key_hole       (1'b0),         // KEY[0] is now hard reset; debug skip removed
-    .key_ball_lost  (~KEY[1]),
     .ball_x         (ball_x),
     .ball_y         (ball_y),
     .ball_lost      (ball_lost),
@@ -184,21 +172,5 @@ vga_renderer renderer (
 assign VGA_R = ball_gray ? 4'h6 : {4{vga_r}};
 assign VGA_G = ball_gray ? 4'h6 : {4{vga_g}};
 assign VGA_B = ball_gray ? 4'h6 : {4{vga_b}};
-
-// ---------------------------------------------------------------------------
-// 7.  Status outputs
-// ---------------------------------------------------------------------------
-
-// LEDs: show balls_remaining (one LED per ball, active-high)
-assign LEDR[2:0] = balls_remaining;
-assign LEDR[9:3] = 7'b0;
-
-// 7-segment displays: all off until BCD decoder is wired in
-assign HEX0 = 8'hFF;
-assign HEX1 = 8'hFF;
-assign HEX2 = 8'hFF;
-assign HEX3 = 8'hFF;
-assign HEX4 = 8'hFF;
-assign HEX5 = 8'hFF;
 
 endmodule

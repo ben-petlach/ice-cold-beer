@@ -1,8 +1,6 @@
 module game_state_machine (
     input  wire        clk,
     input  wire        rst,
-    input  wire        key_hole,        // active-high; edge-detected: simulate target hole sunk
-    input  wire        key_ball_lost,   // active-high; edge-detected: simulate ball lost
     input  wire [7:0]  ball_x,          // ball centre, game coords
     input  wire [6:0]  ball_y,
     input  wire        ball_lost,       // active-high pulse: ball fell past bar
@@ -46,11 +44,7 @@ wire hole_entered      = in_hole       && !in_hole_prev;
 wire non_target_entered = in_non_target && !in_non_target_prev;
 
 assign ball_event = (game_state == S_PLAYING) &&
-                    (hole_entered || key_hole_edge || ball_lost || key_ball_lost_edge || non_target_entered);
-
-reg key_hole_prev, key_ball_lost_prev;
-wire key_hole_edge      = key_hole      && !key_hole_prev;
-wire key_ball_lost_edge = key_ball_lost && !key_ball_lost_prev;
+                    (hole_entered || ball_lost || non_target_entered);
 
 // State machine
 always @(posedge clk) begin
@@ -62,18 +56,14 @@ always @(posedge clk) begin
         score                <= 16'd0;
         in_hole_prev         <= 1'b0;
         in_non_target_prev   <= 1'b0;
-        key_hole_prev        <= 1'b0;
-        key_ball_lost_prev   <= 1'b0;
     end else begin
         in_hole_prev       <= in_hole;
         in_non_target_prev <= in_non_target;
-        key_hole_prev      <= key_hole;
-        key_ball_lost_prev <= key_ball_lost;
 
         case (game_state)
 
             S_PLAYING: begin
-                if (hole_entered || key_hole_edge) begin
+                if (hole_entered) begin
                     score <= score + 16'd1;
                     if (current_step == 4'd9) begin
                         // Completed all 10 holes in this level
@@ -85,7 +75,7 @@ always @(posedge clk) begin
                     end else begin
                         current_step <= current_step + 4'd1;
                     end
-                end else if (ball_lost || key_ball_lost_edge || non_target_entered) begin
+                end else if (ball_lost || non_target_entered) begin
                     if (balls_remaining == 3'd1) begin
                         balls_remaining <= 3'd0;
                         game_state      <= S_GAME_OVER;
