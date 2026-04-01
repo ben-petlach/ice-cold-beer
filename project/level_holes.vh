@@ -13,7 +13,7 @@
 // Level 2:  L:34,22,15   C:17,13,1   R:33,30,25,3
 // Level 3:  L:32,21,12   C:35,27,9,4 R:29,19,3
 
-localparam LEVEL_COUNT     = 4;
+localparam LEVEL_COUNT = 4;
 localparam HOLES_PER_LEVEL = 10;
 
 localparam logic [5:0] LEVEL_HOLES [0:3][0:9] = '{

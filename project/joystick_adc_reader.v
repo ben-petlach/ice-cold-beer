@@ -41,53 +41,53 @@ endfunction
 // FSM
 always @(posedge clk) begin
     if (rst) begin
-        state         <= S_IDLE;
-        current_ch    <= 1'b0;
-        adc_write     <= 1'b0;
-        adc_read      <= 1'b0;
+        state <= S_IDLE;
+        current_ch <= 1'b0;
+        adc_write <= 1'b0;
+        adc_read <= 1'b0;
         adc_writedata <= 32'd0;
-        adc_address   <= 3'd0;
-        joy_left      <= 2'b00;
-        joy_right     <= 2'b00;
+        adc_address <= 3'd0;
+        joy_left <= 2'b00;
+        joy_right <= 2'b00;
     end else begin
         case (state)
 
             S_IDLE: begin
-                adc_write  <= 1'b0;
-                adc_read   <= 1'b0;
-                state      <= S_WR_CMD;
+                adc_write <= 1'b0;
+                adc_read <= 1'b0;
+                state <= S_WR_CMD;
             end
 
             S_WR_CMD: begin
-                adc_write     <= 1'b1;
-                adc_address   <= 3'd0;
+                adc_write <= 1'b1;
+                adc_address <= 3'd0;
                 adc_writedata <= {29'd0, 2'b0, current_ch};  // channel 1 or 2
-                state         <= S_WAIT_WR;
+                state <= S_WAIT_WR;
             end
 
             S_WAIT_WR: begin
                 if (!adc_waitrequest) begin
                     adc_write <= 1'b0;
-                    state     <= S_RD_REQ;
+                    state <= S_RD_REQ;
                 end
             end
 
             S_RD_REQ: begin
-                adc_read    <= 1'b1;
+                adc_read <= 1'b1;
                 adc_address <= current_ch ? 3'd2 : 3'd1; // Address 1 or 2
-                state       <= S_WAIT_RD;
+                state <= S_WAIT_RD;
             end
 
             S_WAIT_RD: begin
                 if (!adc_waitrequest) begin
                     adc_read <= 1'b0;
                     if (current_ch == 1'b0)
-                        joy_left  <= decode_joy(adc_readdata[11:0]);
+                        joy_left <= decode_joy(adc_readdata[11:0]);
                     else
                         joy_right <= decode_joy(adc_readdata[11:0]);
 
-                    current_ch <= ~current_ch; 
-                    state      <= S_IDLE;
+                    current_ch <= ~current_ch;
+                    state <= S_IDLE;
                 end
             end
 
