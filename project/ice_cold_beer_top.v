@@ -124,11 +124,11 @@ game_state_machine gsm (
 wire [9:0] bar_left_y_10, bar_right_y_10;
 
 bar_controller #(
-    .Y_MIN (10'd20),
-    .Y_MAX (10'd110),
-    .MAX_DY (10'd20),
-    .BAR_SPEED (1),
-    .START_Y (10'd110)
+    .Y_MIN    (10'd8),
+    .Y_MAX    (10'd110),
+    .MAX_DY   (10'd20),
+    .BAR_SPEED(1),
+    .START_Y  (10'd110)
 ) bar_ctrl (
     .clk (vga_clk),
     .rst (rst),
