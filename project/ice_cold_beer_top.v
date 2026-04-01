@@ -81,7 +81,6 @@ joystick_adc_reader #(
 // Ball physics
 wire [7:0] ball_x;
 wire [6:0] ball_y;
-wire ball_lost;
 
 ball_physics ball_phys (
     .clk (vga_clk),
@@ -92,8 +91,7 @@ ball_physics ball_phys (
     .bar_left_y (bar_left_y),
     .bar_right_y (bar_right_y),
     .ball_x (ball_x),
-    .ball_y (ball_y),
-    .ball_lost (ball_lost)
+    .ball_y (ball_y)
 );
 
 // Game state machine
@@ -110,7 +108,6 @@ game_state_machine gsm (
     .rst (rst),
     .ball_x (ball_x),
     .ball_y (ball_y),
-    .ball_lost (ball_lost),
     .game_state (game_state),
     .level (level),
     .current_step (current_step),

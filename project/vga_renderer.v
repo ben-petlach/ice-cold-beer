@@ -148,10 +148,7 @@ wire hud_in_round = (game_x >= 8'd149) && (game_x <= 8'd151) &&
                               (game_y >= 7'd1) && (game_y <= 7'd5);
 wire [6:0] hud_round_cy = game_y - 7'd1;
 wire [7:0] hud_round_cx = game_x - 8'd149;
-// bitmap is stored row-major top-to-bottom, so row and column are flipped to match screen direction
-wire [3:0] hud_round_row = 4'd4 - {1'b0, hud_round_cy[2:0]};
-wire [3:0] hud_round_col = 4'd2 - {2'b0, hud_round_cx[1:0]};
-wire [3:0] hud_round_idx = hud_round_row * 3 + hud_round_col;
+wire [3:0] hud_round_idx = {1'b0, hud_round_cy[2:0]} * 4'd3 + {2'b0, hud_round_cx[1:0]};
 wire hud_round_px = hud_in_round && hud_round_bmp[hud_round_idx];
 
 // current hole step within the level, shown as a single digit
@@ -161,9 +158,7 @@ wire hud_in_lvl_ones = (game_x >= 8'd140) && (game_x <= 8'd142) &&
                               (game_y >= 7'd8) && (game_y <= 7'd12);
 wire [6:0] hud_lvl_ones_cy = game_y - 7'd8;
 wire [7:0] hud_lvl_ones_cx = game_x - 8'd140;
-wire [3:0] hud_lvl_ones_row = 4'd4 - {1'b0, hud_lvl_ones_cy[2:0]};
-wire [3:0] hud_lvl_ones_col = 4'd2 - {2'b0, hud_lvl_ones_cx[1:0]};
-wire [3:0] hud_lvl_ones_idx = hud_lvl_ones_row * 3 + hud_lvl_ones_col;
+wire [3:0] hud_lvl_ones_idx = {1'b0, hud_lvl_ones_cy[2:0]} * 4'd3 + {2'b0, hud_lvl_ones_cx[1:0]};
 wire hud_lvl_ones_px = hud_in_lvl_ones && hud_lvl_ones_bmp[hud_lvl_ones_idx];
 
 // tens digit is reserved but unused; step count never exceeds 9

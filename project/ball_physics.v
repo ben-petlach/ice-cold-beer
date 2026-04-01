@@ -7,8 +7,7 @@ module ball_physics (
     input  wire [6:0] bar_left_y,
     input  wire [6:0] bar_right_y,
     output wire [7:0] ball_x,
-    output wire [6:0] ball_y,       
-    output wire       ball_lost     // reserved; always 0 (ball cannot fall off)
+    output wire [6:0] ball_y
 );
 
 localparam S_PLAYING = 3'b001;
@@ -20,8 +19,7 @@ localparam [15:0] POS_MAX  = 16'd29696;  // 116 * 256  right clamp (3 px from wa
 reg [15:0]        pos_x;
 reg signed [15:0] vel_x;
 
-assign ball_x   = pos_x[15:8];
-assign ball_lost = 1'b0;
+assign ball_x = pos_x[15:8];
 
 // Ball Y: bar surface at ball_x, minus 3 (sprite centre above bar)
 wire signed [7:0] bp_slope = $signed({1'b0, bar_right_y}) - $signed({1'b0, bar_left_y});

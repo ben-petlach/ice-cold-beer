@@ -3,7 +3,6 @@ module game_state_machine (
     input  wire rst,
     input  wire [7:0]  ball_x,          // ball centre, game coords
     input  wire [6:0]  ball_y,
-    input  wire ball_lost,       // active-high pulse: ball fell past bar
     output reg [2:0]  game_state,
     output reg [3:0]  level,
     output reg [3:0]  current_step,
@@ -43,7 +42,7 @@ reg in_non_target_prev;
 wire hole_entered = in_hole && !in_hole_prev;
 wire non_target_entered = in_non_target && !in_non_target_prev;
 
-assign ball_event = (game_state == S_PLAYING) && (hole_entered || ball_lost || non_target_entered);
+assign ball_event = (game_state == S_PLAYING) && (hole_entered || non_target_entered);
 
 // State machine
 always @(posedge clk) begin
@@ -74,7 +73,7 @@ always @(posedge clk) begin
                     end else begin
                         current_step <= current_step + 4'd1;
                     end
-                end else if (ball_lost || non_target_entered) begin
+                end else if (non_target_entered) begin
                     if (balls_remaining == 3'd1) begin
                         balls_remaining <= 3'd0;
                         game_state <= S_GAME_OVER;
