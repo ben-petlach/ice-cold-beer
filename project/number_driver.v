@@ -1,5 +1,5 @@
 module number_driver (
-    input  [3:0] digit,       // digit to display: 0-9
+    input [3:0] digit,       // digit to display: 0-9
     output reg [14:0] bitmap  // 15-bit pixel map for the 3x5 character cell
 );
     always @(*) begin
