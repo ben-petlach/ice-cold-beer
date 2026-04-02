@@ -8,7 +8,14 @@ module ice_cold_beer_top (
     output wire [3:0]  VGA_G,
     output wire [3:0]  VGA_B,
     output wire        VGA_HS,
-    output wire        VGA_VS
+    output wire        VGA_VS,
+
+    output wire [7:0]  HEX0,
+    output wire [7:0]  HEX1,
+    output wire [7:0]  HEX2,
+    output wire [7:0]  HEX3,
+    output wire [7:0]  HEX4,
+    output wire [7:0]  HEX5
 );
 
 wire vga_clk;
@@ -172,5 +179,17 @@ vga_renderer renderer (
 assign VGA_R = ball_gray ? 4'h6 : {4{vga_r}};
 assign VGA_G = ball_gray ? 4'h6 : {4{vga_g}};
 assign VGA_B = ball_gray ? 4'h6 : {4{vga_b}};
+
+// Seven-segment display driver — shows "u win" or "u lose" on game over
+seven_segment_driver seg_drv (
+    .game_state      (game_state),
+    .balls_remaining (balls_remaining),
+    .HEX5            (HEX5),
+    .HEX4            (HEX4),
+    .HEX3            (HEX3),
+    .HEX2            (HEX2),
+    .HEX1            (HEX1),
+    .HEX0            (HEX0)
+);
 
 endmodule
