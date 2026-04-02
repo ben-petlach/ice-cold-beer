@@ -17,9 +17,9 @@ module bar_controller #(
     output reg  [9:0]  bar_right_y   // Screen Y coordinate of right end
 );
 
-    wire move_l_up   = (joy_left  == 2'b10);
-    wire move_l_down = (joy_left  == 2'b01);
-    wire move_r_up   = (joy_right == 2'b10);
+    wire move_l_up = (joy_left == 2'b10);
+    wire move_l_down = (joy_left == 2'b01);
+    wire move_r_up = (joy_right == 2'b10);
     wire move_r_down = (joy_right == 2'b01);
 
     wire [9:0] proposed_left_y = move_l_up ? (bar_left_y > (Y_MIN + BAR_SPEED) ? bar_left_y - BAR_SPEED : Y_MIN) :

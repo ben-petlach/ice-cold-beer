@@ -4,7 +4,7 @@ module video_sync_generator(
     output reg blank_n,
     output reg HS,
     output reg VS,
-    output reg [10:0] h_cnt, // Exposed horizontal counter
+    output reg [9:0] h_cnt, // Exposed horizontal counter
     output reg [9:0] v_cnt   // Exposed vertical counter
 );
 
