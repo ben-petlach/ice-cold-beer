@@ -213,7 +213,7 @@ adc_hex_debug adc_dbg (
     .HEX0           (dbg_HEX0)
 );
 
-// Mux HEX outputs: debug display when SW[8] is on, game display otherwise
+// debug display when SW[8] is on, game display otherwise
 assign HEX0 = SW[8] ? dbg_HEX0 : game_HEX0;
 assign HEX1 = SW[8] ? dbg_HEX1 : game_HEX1;
 assign HEX2 = SW[8] ? dbg_HEX2 : game_HEX2;

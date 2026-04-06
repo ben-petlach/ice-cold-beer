@@ -13,23 +13,14 @@ module seven_segment_driver (
     localparam S_PLAYING   = 3'b001;
     localparam S_GAME_OVER = 3'b010;
 
-    // u: segments 5,4,3,2,1 ON
     localparam CHAR_U     = 8'b1100_0001;  
-    // w: segments 5,6,1,3 ON
     localparam CHAR_W     = 8'b1001_0101;  
-    // i: segment 2 ON
     localparam CHAR_I     = 8'b1111_1011;  
-    // n: segments 4,6,2 ON
     localparam CHAR_N     = 8'b1010_1011;  
-    // l: segments 5,4,3 ON
     localparam CHAR_L     = 8'b1100_0111;  
-    // o: segments 6,4,3,2 ON
     localparam CHAR_O     = 8'b1010_0011;  
-    // s: segments 0,5,6,2,3 ON
     localparam CHAR_S     = 8'b1001_0010;  
-    // e: segments 0,5,6,4,3 ON
     localparam CHAR_E     = 8'b1000_0110;  
-    // blank: all segments OFF
     localparam CHAR_BLANK = 8'b1111_1111;  
 
     // Win condition: game over with balls remaining > 0

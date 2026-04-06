@@ -1,51 +1,50 @@
-## Game State Machine
+# Ice Cold Beer — FPGA Arcade Game
 
-```mermaid
-graph TD
-    %% Entry point
-    Start((START))
+An FPGA recreation of the classic *Ice Cold Beer* arcade game, built on the **Intel DE10-Lite** (MAX 10) board using Verilog. Two analog joysticks tilt a bar to guide a steel ball upward through a field of holes, aiming for the highlighted target hole while avoiding all others.
 
-    %% Real register states (game_state_machine.v)
-    S_PLAYING(((S_PLAYING)))
-    S_GAME_OVER(((S_GAME_OVER)))
+📹 **Demo Video:** [https://youtu.be/O9O6KEt9drc](https://youtu.be/O9O6KEt6drc)
 
-    %% Combinational decisions — resolved within one clock edge
-    D_TARGET{"hole_entered?"}
-    D_STEP{"current_step == 9?"}
-    D_LEVEL{"level == 3?"}
-    D_LIVES{"balls_remaining == 1?"}
+---
 
-    %% Styling
-    style Start fill:#fff,stroke:#fff,stroke-dasharray: 5 5
-    style S_PLAYING fill:#bbf,stroke:#333,stroke-width:2px
-    style S_GAME_OVER fill:#fbb,stroke:#333,stroke-width:2px
-    style D_TARGET fill:#ffe,stroke:#999
-    style D_STEP fill:#ffe,stroke:#999
-    style D_LEVEL fill:#ffe,stroke:#999
-    style D_LIVES fill:#ffe,stroke:#999
+## Contributors
 
-    %% Reset
-    Start -->|"rst"| S_PLAYING
+| Member | Responsibilities |
+|--------|-----------------|
+| **Abie** | Background artwork, VGA renderer (`vga_renderer.v`), number driver (`number_driver.v`), ball physics (`ball_physics.v`) |
+| **Ben** | Bar controller (`bar_controller.v`), ADC/joystick interfacing (`joystick_adc_reader.v`), seven-segment display (`seven_segment_driver.v`), ball physics (`ball_physics.v`) |
 
-    %% Physics self-loop — runs every tick_60hz (~60 Hz)
-    S_PLAYING -->|"tick_60hz: physics + bar update\nwall hit: clamp pos, zero vel"| S_PLAYING
+---
 
-    %% ball_event fires — ball_physics + bar_controller reset instantly
-    S_PLAYING -->|"ball_event\n[ball + bar reset to start]"| D_TARGET
+## Design Overview
 
-    %% Success path
-    D_TARGET -->|"yes: target hole\n[score++]"| D_STEP
-    D_STEP -->|"no\n[current_step++]"| S_PLAYING
-    D_STEP -->|"yes"| D_LEVEL
-    D_LEVEL -->|"no\n[level++, current_step=0]"| S_PLAYING
-    D_LEVEL -->|"yes: all levels done"| S_GAME_OVER
+The system runs entirely on the DE10-Lite's MAX 10 FPGA at a 25 MHz pixel clock (derived from the 50 MHz board clock via a PLL). The design is organized into the following core modules:
 
-    %% Fail path
-    D_TARGET -->|"no: wrong hole"| D_LIVES
-    D_LIVES -->|"no\n[balls_remaining--]"| S_PLAYING
-    D_LIVES -->|"yes"| S_GAME_OVER
+- **VGA Renderer** (`vga_renderer.v`) — Drives a 640×480 VGA display by mapping it to a 160×120 game-pixel grid (4× upscaled). Renders a monochrome background bitmap loaded from a `.hex` file, a linearly-interpolated tilting bar, a 7×7 circular ball sprite with a specular highlight, 37 rounded holes (with target highlighting), and a HUD showing the current round, step, and remaining lives.
 
-    %% Game over
-    S_GAME_OVER -->|"~rst"| S_GAME_OVER
-    S_GAME_OVER -->|"rst"| S_PLAYING
-```
+- **Ball Physics** (`ball_physics.v`) — Simulates 1D horizontal ball motion using fixed-point arithmetic (8.8 format). The bar's tilt angle drives acceleration; a ⅛-per-tick damping model provides friction, and a deadzone around level prevents drift. Wall collisions clamp position and zero velocity.
+
+- **Bar Controller** (`bar_controller.v`) — Translates 2-bit joystick direction signals (up/down/neutral per side) into independent left and right bar Y positions, clamped to screen bounds and constrained by a maximum tilt angle (`MAX_DY`).
+
+- **Game State Machine** (`game_state_machine.v`) — A two-state FSM (`S_PLAYING` / `S_GAME_OVER`) managing 4 levels of 10 target-hole sequences each. Detects ball-in-hole collisions using a 4×4 inner zone (corners excluded) across all 37 holes. Correct holes advance the step; wrong holes cost a life.
+
+- **Joystick ADC Reader** (`joystick_adc_reader.v`) — An Avalon-MM bus master that continuously polls two ADC channels connected to analog joysticks. A 5-state FSM handles the write-command / read-data handshake with the Platform Designer ADC IP. Raw 12-bit samples are thresholded into 2-bit up/down/neutral signals with configurable deadzones.
+
+- **Seven-Segment Driver** (`seven_segment_driver.v`) — Displays "u win" or "u lose" on the six HEX displays when the game ends, based on whether the player has remaining lives.
+
+- **ADC Hex Debug** (`adc_hex_debug.v`) — A diagnostic overlay toggled by `SW[8]` that shows raw 12-bit ADC values in hexadecimal on the seven-segment displays, selectable between left and right channels via `SW[7]`.
+
+- **Supporting files:** `vga_pll.v` (PLL wrapper), `video_sync_generator.v` (VGA timing), `number_driver.v` (3×5 bitmap digit font), `hole_positions.vh` (37 hole coordinates), `level_holes.vh` (per-level target sequences).
+
+---
+
+## References & Sources
+
+- **ADC Debug Display** (`adc_hex_debug.v`): Based on the [de10lite-hello-adc](https://github.com/FedorChervyakov/de10lite-hello-adc) reference project by Fedor Chervyakov. The ADC Avalon-MM bus interface pattern in `joystick_adc_reader.v` was also informed by this project.
+
+- **DE10-Lite Golden Top** (`DE10_LITE_Golden_Top.v`): Generated by the Terasic System Builder; used as a pin-assignment reference.
+
+- **Joystick ADC IP** (`joystick_adc/`): Platform Designer (Qsys) auto-generated Avalon ADC subsystem, including Intel/Altera IP cores.
+
+- **AI-Assisted Development**: Several modules were developed and iteratively refined with the assistance of an AI coding tool (Gemini and Claude). Specifically, AI was used as a pair-programming aid for drafting, debugging, and refining the following files: `vga_renderer.v`, `ball_physics.v`, `bar_controller.v`, `game_state_machine.v`, `joystick_adc_reader.v`, and `adc_hex_debug.v`. All AI-generated code was reviewed, tested, and modified by the team.
+
+- **DE10-Lite User Manual** (Terasic): Used for pin assignments and board peripheral reference.
