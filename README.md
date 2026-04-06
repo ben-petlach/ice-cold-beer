@@ -19,19 +19,19 @@ An FPGA recreation of the classic *Ice Cold Beer* arcade game, built on the **In
 
 The system runs entirely on the DE10-Lite's MAX 10 FPGA at a 25 MHz pixel clock (derived from the 50 MHz board clock via a PLL). The design is organized into the following core modules:
 
-- **VGA Renderer** (`vga_renderer.v`) — Drives a 640×480 VGA display by mapping it to a 160×120 game-pixel grid (4× upscaled). Renders a monochrome background bitmap loaded from a `.hex` file, a linearly-interpolated tilting bar, a 7×7 circular ball sprite with a specular highlight, 37 rounded holes (with target highlighting), and a HUD showing the current round, step, and remaining lives.
+- **VGA Renderer** (`vga_renderer.v`): Drives a 640×480 VGA display by mapping it to a 160×120 game-pixel grid (4× upscaled). Renders a monochrome background bitmap loaded from a `.hex` file, a linearly-interpolated tilting bar, a 7×7 circular ball sprite, 37 rounded holes (with target highlighting), and a HUD showing the current round, step, and remaining lives.
 
-- **Ball Physics** (`ball_physics.v`) — Simulates 1D horizontal ball motion using fixed-point arithmetic (8.8 format). The bar's tilt angle drives acceleration; a ⅛-per-tick damping model provides friction, and a deadzone around level prevents drift. Wall collisions clamp position and zero velocity.
+- **Ball Physics** (`ball_physics.v`): Simulates 1D horizontal ball motion using fixed-point arithmetic (8.8 format). The bar's tilt angle drives acceleration; a damping model provides friction, and a deadzone around level prevents drift. Wall collisions clamp position and zero velocity.
 
-- **Bar Controller** (`bar_controller.v`) — Translates 2-bit joystick direction signals (up/down/neutral per side) into independent left and right bar Y positions, clamped to screen bounds and constrained by a maximum tilt angle (`MAX_DY`).
+- **Bar Controller** (`bar_controller.v`): Translates 2-bit joystick direction signals (up/down/neutral per side) into independent left and right bar Y positions, clamped to screen bounds and constrained by a maximum tilt angle (`MAX_DY`).
 
-- **Game State Machine** (`game_state_machine.v`) — A two-state FSM (`S_PLAYING` / `S_GAME_OVER`) managing 4 levels of 10 target-hole sequences each. Detects ball-in-hole collisions using a 4×4 inner zone (corners excluded) across all 37 holes. Correct holes advance the step; wrong holes cost a life.
+- **Game State Machine** (`game_state_machine.v`): A two-state FSM (`S_PLAYING` / `S_GAME_OVER`) managing 4 levels of 10 target-hole sequences each. Detects ball-in-hole collisions using a 4×4 inner zone (corners excluded) across all 37 holes. Correct holes advance the step; wrong holes cost a life.
 
-- **Joystick ADC Reader** (`joystick_adc_reader.v`) — An Avalon-MM bus master that continuously polls two ADC channels connected to analog joysticks. A 5-state FSM handles the write-command / read-data handshake with the Platform Designer ADC IP. Raw 12-bit samples are thresholded into 2-bit up/down/neutral signals with configurable deadzones.
+- **Joystick ADC Reader** (`joystick_adc_reader.v`): An Avalon-MM bus master that continuously polls two ADC channels connected to analog joysticks. A 5-state FSM handles the write-command / read-data handshake with the Platform Designer ADC IP. Raw 12-bit samples are thresholded into 2-bit up/down/neutral signals with configurable deadzones.
 
-- **Seven-Segment Driver** (`seven_segment_driver.v`) — Displays "u win" or "u lose" on the six HEX displays when the game ends, based on whether the player has remaining lives.
+- **Seven-Segment Driver** (`seven_segment_driver.v`): Displays "u win" or "u lose" on the six HEX displays when the game ends, based on whether the player has remaining lives.
 
-- **ADC Hex Debug** (`adc_hex_debug.v`) — A diagnostic overlay toggled by `SW[8]` that shows raw 12-bit ADC values in hexadecimal on the seven-segment displays, selectable between left and right channels via `SW[7]`.
+- **ADC Hex Debug** (`adc_hex_debug.v`): A diagnostic overlay toggled by `SW[8]` that shows raw 12-bit ADC values in hexadecimal on the seven-segment displays, selectable between left and right channels via `SW[7]`.
 
 - **Supporting files:** `vga_pll.v` (PLL wrapper), `video_sync_generator.v` (VGA timing), `number_driver.v` (3×5 bitmap digit font), `hole_positions.vh` (37 hole coordinates), `level_holes.vh` (per-level target sequences).
 
