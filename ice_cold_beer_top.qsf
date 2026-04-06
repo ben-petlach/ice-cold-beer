@@ -57,6 +57,30 @@ set_location_assignment PIN_B14 -to SW[8]
 set_location_assignment PIN_F15 -to SW[9]
 
 # -------------------------------------------------------------------------- #
+# LEDs
+# -------------------------------------------------------------------------- #
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[0]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[1]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[2]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[3]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[4]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[5]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[6]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[7]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[8]
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to LEDR[9]
+set_location_assignment PIN_A8 -to LEDR[0]
+set_location_assignment PIN_A9 -to LEDR[1]
+set_location_assignment PIN_A10 -to LEDR[2]
+set_location_assignment PIN_B10 -to LEDR[3]
+set_location_assignment PIN_D13 -to LEDR[4]
+set_location_assignment PIN_C13 -to LEDR[5]
+set_location_assignment PIN_E14 -to LEDR[6]
+set_location_assignment PIN_D14 -to LEDR[7]
+set_location_assignment PIN_A11 -to LEDR[8]
+set_location_assignment PIN_B11 -to LEDR[9]
+
+# -------------------------------------------------------------------------- #
 # Seven-Segment Displays (active-low)
 # -------------------------------------------------------------------------- #
 set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to HEX0[0]
@@ -212,4 +236,5 @@ set_global_assignment -name VERILOG_FILE project/number_driver.v
 set_global_assignment -name VERILOG_FILE project/seven_segment_driver.v
 set_global_assignment -name VERILOG_INCLUDE_FILE project/hole_positions.vh
 set_global_assignment -name VERILOG_INCLUDE_FILE project/level_holes.vh
+set_global_assignment -name VERILOG_FILE project/adc_hex_debug.v
 set_instance_assignment -name PARTITION_HIERARCHY root_partition -to | -section_id Top
