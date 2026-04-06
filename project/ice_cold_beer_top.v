@@ -68,6 +68,8 @@ joystick_adc adc_ip (
 
 wire [1:0] joy_left_sig;
 wire [1:0] joy_right_sig;
+wire [11:0] adc_raw_left;
+wire [11:0] adc_raw_right;
 
 joystick_adc_reader #(
     .THRESH_HIGH (12'd2500), // > 2.0 V
@@ -82,7 +84,9 @@ joystick_adc_reader #(
     .adc_readdata (adc_readdata),
     .adc_waitrequest (adc_waitrequest),
     .joy_left (joy_left_sig),
-    .joy_right (joy_right_sig)
+    .joy_right (joy_right_sig),
+    .adc_raw_left (adc_raw_left),
+    .adc_raw_right (adc_raw_right)
 );
 
 // Ball physics
@@ -178,15 +182,43 @@ assign VGA_G = ball_gray ? 4'h6 : {4{vga_g}};
 assign VGA_B = ball_gray ? 4'h6 : {4{vga_b}};
 
 // Seven-segment display driver — shows "u win" or "u lose" on game over
+wire [7:0] game_HEX0, game_HEX1, game_HEX2, game_HEX3, game_HEX4, game_HEX5;
+
 seven_segment_driver seg_drv (
     .game_state      (game_state),
     .balls_remaining (balls_remaining),
-    .HEX5            (HEX5),
-    .HEX4            (HEX4),
-    .HEX3            (HEX3),
-    .HEX2            (HEX2),
-    .HEX1            (HEX1),
-    .HEX0            (HEX0)
+    .HEX5            (game_HEX5),
+    .HEX4            (game_HEX4),
+    .HEX3            (game_HEX3),
+    .HEX2            (game_HEX2),
+    .HEX1            (game_HEX1),
+    .HEX0            (game_HEX0)
 );
+
+// ADC debug display — shows raw 12-bit ADC value in hex on HEX displays
+// Attribution: ADC display concept from de10lite-hello-adc-dev project
+// SW[8] = enable debug display, SW[7] = select channel (0=left, 1=right)
+wire [7:0] dbg_HEX0, dbg_HEX1, dbg_HEX2, dbg_HEX3, dbg_HEX4, dbg_HEX5;
+
+adc_hex_debug adc_dbg (
+    .debug_sw       (SW[8]),
+    .ch_sel         (SW[7]),
+    .adc_raw_left   (adc_raw_left),
+    .adc_raw_right  (adc_raw_right),
+    .HEX5           (dbg_HEX5),
+    .HEX4           (dbg_HEX4),
+    .HEX3           (dbg_HEX3),
+    .HEX2           (dbg_HEX2),
+    .HEX1           (dbg_HEX1),
+    .HEX0           (dbg_HEX0)
+);
+
+// Mux HEX outputs: debug display when SW[8] is on, game display otherwise
+assign HEX0 = SW[8] ? dbg_HEX0 : game_HEX0;
+assign HEX1 = SW[8] ? dbg_HEX1 : game_HEX1;
+assign HEX2 = SW[8] ? dbg_HEX2 : game_HEX2;
+assign HEX3 = SW[8] ? dbg_HEX3 : game_HEX3;
+assign HEX4 = SW[8] ? dbg_HEX4 : game_HEX4;
+assign HEX5 = SW[8] ? dbg_HEX5 : game_HEX5;
 
 endmodule

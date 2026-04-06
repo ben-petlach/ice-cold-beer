@@ -13,7 +13,11 @@ module joystick_adc_reader #(
     input  wire        adc_waitrequest,
 
     output reg  [1:0]  joy_left,    // channel 1
-    output reg  [1:0]  joy_right    // channel 2
+    output reg  [1:0]  joy_right,   // channel 2
+
+    // Raw 12-bit ADC sample outputs (for debug display)
+    output reg [11:0]  adc_raw_left,
+    output reg [11:0]  adc_raw_right
 );
 
 // FSM States
@@ -49,6 +53,8 @@ always @(posedge clk) begin
         adc_address <= 3'd0;
         joy_left <= 2'b00;
         joy_right <= 2'b00;
+        adc_raw_left  <= 12'd0;
+        adc_raw_right <= 12'd0;
     end else begin
         case (state)
 
@@ -81,10 +87,13 @@ always @(posedge clk) begin
             S_WAIT_RD: begin
                 if (!adc_waitrequest) begin
                     adc_read <= 1'b0;
-                    if (current_ch == 1'b0)
-                        joy_left <= decode_joy(adc_readdata[11:0]);
-                    else
-                        joy_right <= decode_joy(adc_readdata[11:0]);
+                    if (current_ch == 1'b0) begin
+                        joy_left     <= decode_joy(adc_readdata[11:0]);
+                        adc_raw_left <= adc_readdata[11:0];
+                    end else begin
+                        joy_right     <= decode_joy(adc_readdata[11:0]);
+                        adc_raw_right <= adc_readdata[11:0];
+                    end
 
                     current_ch <= ~current_ch;
                     state <= S_IDLE;
